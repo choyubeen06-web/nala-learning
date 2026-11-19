@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NALA — Learn a little. Grow a lot.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Fraunces:ital,opsz,wght@1,9..144,400;1,9..144,600&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f7f8f3;--card:#fff;--ink:#17231d;--muted:#68726c;--soft:#9aa39d;--line:#e4e8dd;--line2:#eef1ea;
+  --green:#1f4a37;--green2:#2c6149;--green3:#3d7a5d;--lime:#e4f2b8;--lime2:#cfe58a;--orange:#e8743b;--red:#c4453b;--redbg:#fbe9e6;
+  --sage:#e3efdc;--sage-i:#2f5a3f;--peach:#fde4d4;--peach-i:#a2502a;--lavender:#ece7fb;--lavender-i:#5b4b9a;--blue:#e2ecfa;--blue-i:#2f5b93;--butter:#fbf1cb;--butter-i:#82630f;
+  --r:18px;--r2:12px;--sh:0 1px 2px rgba(23,35,29,.04),0 10px 30px rgba(23,35,29,.05);
+  --head:'Bricolage Grotesque',system-ui,sans-serif;--body:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;--serif:'Fraunces',Georgia,serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+a{color:inherit}
+h1,h2,h3,h4{font-family:var(--head);margin:0;letter-spacing:-.01em}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+/* shell */
+.app{display:grid;grid-template-columns:252px 1fr;min-height:100vh}
+.side{position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:18px;padding:22px 16px;border-right:1px solid var(--line);background:#fbfcf8;overflow:auto}
+.brand{display:flex;align-items:center;gap:6px;padding:0 8px;font-family:var(--head);font-weight:800;font-size:24px;color:var(--green);letter-spacing:-.02em}
+.brand .ast{color:var(--orange);font-size:22px}
+.brand small{font-family:var(--body);font-weight:500;font-size:11px;color:var(--soft);letter-spacing:.04em;margin-left:auto}
+.roles{display:grid;grid-template-columns:1fr 1fr;background:var(--line2);border-radius:999px;padding:4px}
+.roles button{border:0;background:none;border-radius:999px;padding:8px 0;font-weight:700;font-size:13px;color:var(--muted)}
+.roles button.on{background:var(--green);color:#fff;box-shadow:0 2px 8px rgba(31,74,55,.25)}
+.picker{display:flex;flex-direction:column;gap:6px;padding:0 4px}
+.picker label{font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--soft)}
+select,input[type=text],input[type=url],input[type=date],input[type=time],input[type=number],textarea{width:100%;border:1px solid var(--line);background:#fff;border-radius:10px;padding:9px 11px;outline:none;transition:border .15s,box-shadow .15s}
+select:focus,input:focus,textarea:focus{border-color:var(--green3);box-shadow:0 0 0 3px rgba(61,122,93,.14)}
+textarea{resize:vertical;min-height:84px}
+.nav{display:flex;flex-direction:column;gap:2px}
+.nav-label{font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--soft);padding:8px 12px 4px}
+.nav button{display:flex;align-items:center;gap:11px;border:0;background:none;padding:10px 12px;border-radius:12px;font-weight:500;color:#3c4741;text-align:left}
+.nav button:hover{background:var(--line2)}
+.nav button.on{background:var(--lime);color:var(--green);font-weight:700}
+.nav .cnt{margin-left:auto;background:var(--orange);color:#fff;font-size:11px;font-weight:700;border-radius:999px;padding:1px 7px}
+.side-foot{margin-top:auto;display:flex;flex-direction:column;gap:10px}
+.sync{display:flex;gap:10px;align-items:flex-start;background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px;font-size:12px;color:var(--muted)}
+.sync b{display:block;color:var(--ink);font-size:13px}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--soft);margin-top:5px;flex:none}
+.dot.live{background:#3fb37a;box-shadow:0 0 0 4px rgba(63,179,122,.18)}
+.dot.warn{background:var(--orange)}
+.main{min-width:0;display:flex;flex-direction:column}
+.grid2>*,.stack>*,.app>*{min-width:0}
+.top{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:12px;padding:14px 32px;background:rgba(247,248,243,.86);backdrop-filter:blur(10px);border-bottom:1px solid var(--line2)}
+.crumb{font-size:13px;color:var(--muted);font-weight:500}
+.crumb b{color:var(--ink)}
+.top-r{margin-left:auto;display:flex;align-items:center;gap:10px}
+.avatar{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:13px;flex:none}
+.m-only{display:none}
+.content{padding:28px 32px 120px;max-width:1280px;width:100%}
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--line);background:#fff;border-radius:999px;padding:9px 16px;font-weight:700;font-size:14px;text-decoration:none;white-space:nowrap;transition:transform .1s,background .15s}
+.btn:hover{background:var(--line2)}
+.btn:active{transform:scale(.98)}
+.btn.pri{background:var(--green);border-color:var(--green);color:#fff}
+.btn.pri:hover{background:var(--green2)}
+.btn.lime{background:var(--lime);border-color:var(--lime2);color:var(--green)}
+.btn.lime:hover{background:var(--lime2)}
+.btn.meet{background:#1a73e8;border-color:#1a73e8;color:#fff}
+.btn.meet:hover{background:#1765cc}
+.btn.ghost{border-color:transparent;background:none}
+.btn.danger{color:var(--red);border-color:#f0cfca}
+.btn.sm{padding:6px 12px;font-size:13px}
+.btn.xs{padding:4px 10px;font-size:12px}
+.btn[disabled],.btn.off{opacity:.5;pointer-events:none}
+.icon-btn{border:1px solid var(--line);background:#fff;width:34px;height:34px;border-radius:50%;display:inline-grid;place-items:center}
+.icon-btn:hover{background:var(--line2)}
+/* type */
+.eyebrow{font-size:11px;font-weight:800;letter-spacing:.12em;color:var(--green3);text-transform:uppercase;display:flex;align-items:center;gap:10px}
+.eyebrow:after{content:"";width:40px;height:1px;background:var(--lime2)}
+.ptitle{font-size:34px;font-weight:800;line-height:1.15;margin:8px 0 6px}
+.ptitle em{font-family:var(--serif);font-style:italic;font-weight:400;color:var(--green3)}
+.ptitle .ast{color:var(--orange)}
+.lead{color:var(--muted);margin:0 0 22px}
+.head-row{display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:22px}
+.head-row .lead{margin:0}
+.head-row .act{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+.sec-t{display:flex;align-items:center;gap:10px;margin:30px 0 14px}
+.sec-t h2{font-size:20px}
+.sec-t .more{margin-left:auto}
+.muted{color:var(--muted)}
+.small{font-size:13px}
+/* cards */
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--sh);padding:20px}
+.card h3{font-size:16px;margin-bottom:10px}
+.grid2{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(300px,1fr);gap:22px;align-items:start}
+.stack{display:flex;flex-direction:column;gap:16px}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:8px}
+.kpi{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px 18px}
+.kpi small{color:var(--muted);font-weight:500;font-size:12px}
+.kpi b{display:block;font-family:var(--head);font-size:28px;font-weight:800;margin-top:2px}
+.kpi.hl{background:var(--green);color:#fff;border-color:var(--green)}
+.kpi.hl small{color:#cfe2d6}
+/* hero */
+.hero{position:relative;overflow:hidden;background:var(--green);color:#fff;border-radius:24px;padding:28px 30px;display:flex;gap:24px;align-items:center}
+.hero:before{content:"";position:absolute;right:-60px;top:-80px;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle,rgba(228,242,184,.18),transparent 70%)}
+.hero .tag{font-size:11px;font-weight:800;letter-spacing:.12em;color:var(--lime2)}
+.hero h2{font-size:30px;font-weight:800;line-height:1.15;margin:8px 0}
+.hero h2 em{font-family:var(--serif);font-style:italic;font-weight:400;color:var(--lime)}
+.hero p{color:#cfe2d6;margin:0 0 16px}
+.ring{--p:0;width:120px;height:120px;border-radius:50%;flex:none;display:grid;place-items:center;background:conic-gradient(var(--lime2) calc(var(--p)*1%),rgba(255,255,255,.12) 0);position:relative;margin-left:auto}
+.ring:after{content:"";position:absolute;inset:10px;border-radius:50%;background:var(--green)}
+.ring span{position:relative;z-index:1;text-align:center;font-family:var(--head);font-weight:800;font-size:26px;line-height:1}
+.ring small{display:block;font-family:var(--body);font-size:11px;font-weight:500;color:#cfe2d6;margin-top:4px}
+/* chips */
+.chip{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:700;border-radius:999px;padding:3px 9px;white-space:nowrap}
+.t-sage{background:var(--sage);color:var(--sage-i)}.t-peach{background:var(--peach);color:var(--peach-i)}.t-lavender{background:var(--lavender);color:var(--lavender-i)}.t-blue{background:var(--blue);color:var(--blue-i)}.t-butter{background:var(--butter);color:var(--butter-i)}
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;border-radius:6px;padding:2px 7px;background:var(--line2);color:var(--muted)}
+.badge.fb{background:#fff1e8;color:#b5541f}
+.badge.ok{background:#e4f4ea;color:#23784a}
+.badge.wait{background:#fff6d9;color:#8a6a0c}
+.badge.redo{background:var(--redbg);color:var(--red)}
+.badge.live{background:#e8f0fe;color:#1a5fc9}
+/* tasks list */
+.tlist{display:flex;flex-direction:column}
+.trow{display:flex;align-items:center;gap:14px;padding:13px 4px;border-top:1px solid var(--line2)}
+.trow:first-child{border-top:0}
+.trow .ico{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;font-weight:800;flex:none}
+.trow .tx{min-width:0;flex:1}
+.trow .tx b{display:block;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.trow .tx small{color:var(--muted);font-size:12.5px}
+.trow.done .tx b{color:var(--soft);text-decoration:line-through}
+.chk{width:26px;height:26px;border-radius:50%;border:2px solid var(--line);background:#fff;display:grid;place-items:center;color:#fff;flex:none}
+.chk.on{background:var(--green3);border-color:var(--green3)}
+.empty{padding:26px;text-align:center;color:var(--muted);border:1.5px dashed var(--line);border-radius:14px;font-size:14px}
+/* week grid */
+.weekbar{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.weekbar .lbl{font-family:var(--head);font-weight:800;font-size:17px;margin:0 6px}
+.week{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:10px}
+.day{background:#fff;border:1px solid var(--line);border-radius:16px;padding:10px;min-height:190px;display:flex;flex-direction:column;gap:8px}
+.day.today{border-color:var(--green3);box-shadow:0 0 0 3px rgba(61,122,93,.12)}
+.day.past{background:#fafbf7}
+.day-h{display:flex;align-items:baseline;gap:6px;padding:2px 4px}
+.day-h b{font-family:var(--head);font-size:15px}
+.day-h small{color:var(--muted);font-size:12px}
+.day-h .add{margin-left:auto;border:0;background:var(--line2);width:24px;height:24px;border-radius:8px;display:grid;place-items:center;color:var(--green)}
+.day-h .add:hover{background:var(--lime)}
+.day-h .min{margin-left:auto;font-size:11px;color:var(--soft)}
+.tcard{display:flex;flex-direction:column;gap:5px;text-align:left;border:1px solid var(--line2);background:var(--bg);border-radius:12px;padding:9px 10px;width:100%}
+.tcard:hover{border-color:var(--lime2);background:#fff}
+.tcard b{font-size:13px;line-height:1.35;font-weight:700}
+.tcard small{font-size:11.5px;color:var(--muted)}
+.tcard .tc-top{display:flex;align-items:center;gap:6px}
+.tcard .tc-top .st{margin-left:auto}
+.tcard.st-done{opacity:.62}
+.tcard.st-done b{text-decoration:line-through}
+.tcard.o-feedback{border-left:3px solid var(--orange)}
+.tcard.o-adjust{border-left:3px solid var(--blue-i)}
+.sdot{width:9px;height:9px;border-radius:50%;background:var(--line);display:inline-block}
+.sdot.done{background:var(--green3)}.sdot.submitted{background:#e2b21c}.sdot.redo{background:var(--red)}.sdot.todo.late{background:var(--orange)}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-top:12px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+/* lessons */
+.lgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px}
+.lcard{border:1px solid var(--line);background:#fff;border-radius:18px;overflow:hidden;text-align:left;padding:0;display:flex;flex-direction:column;transition:transform .15s,box-shadow .15s}
+.lcard:hover{transform:translateY(-2px);box-shadow:var(--sh)}
+.thumb{position:relative;aspect-ratio:16/9;display:grid;place-items:center;font-family:var(--serif);font-style:italic;font-size:20px;padding:16px;text-align:center}
+.thumb .pl{position:absolute;width:46px;height:46px;border-radius:50%;background:rgba(255,255,255,.9);display:grid;place-items:center;box-shadow:0 6px 18px rgba(0,0,0,.12);color:var(--green);right:14px;bottom:14px}
+.thumb .dur{position:absolute;left:12px;bottom:12px;background:rgba(23,35,29,.72);color:#fff;font-family:var(--body);font-style:normal;font-size:11px;font-weight:700;border-radius:6px;padding:2px 7px}
+.thumb .stamp{position:absolute;left:12px;top:12px}
+.lcard .lb{padding:14px 16px 16px;display:flex;flex-direction:column;gap:6px}
+.lcard .lb b{font-size:15.5px}
+.lcard .lb small{color:var(--muted);font-size:12.5px}
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+.filters button{border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 14px;font-size:13px;font-weight:700;color:var(--muted)}
+.filters button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+/* player */
+.player{background:var(--green);border-radius:22px;overflow:hidden;color:#fff;box-shadow:0 20px 50px rgba(31,74,55,.25)}
+.screen{position:relative;aspect-ratio:16/9;display:flex;flex-direction:column;justify-content:center;padding:6% 8%;background:radial-gradient(120% 120% at 100% 0,#2f6b50 0,var(--green) 55%)}
+.screen .segno{font-size:12px;font-weight:800;letter-spacing:.12em;color:var(--lime2)}
+.screen h2{font-size:clamp(22px,3.2vw,38px);font-weight:800;margin:10px 0 14px;line-height:1.15}
+.screen .formula{font-family:var(--serif);font-style:italic;font-size:clamp(22px,3.4vw,40px);color:var(--lime);margin-bottom:14px}
+.screen p{font-size:clamp(14px,1.5vw,18px);color:#d7e7dd;max-width:720px;margin:0}
+.screen .fade{animation:fade .45s ease}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.screen iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.ctrl{display:flex;align-items:center;gap:14px;padding:12px 18px;background:rgba(0,0,0,.18)}
+.ctrl .pbtn{width:42px;height:42px;border-radius:50%;border:0;background:var(--lime);color:var(--green);display:grid;place-items:center;flex:none}
+.bar{flex:1;display:flex;gap:4px;height:6px}
+.bar button{flex:1;border:0;padding:0;border-radius:3px;background:rgba(255,255,255,.2);position:relative;overflow:hidden;height:6px}
+.bar button i{position:absolute;inset:0;width:0;background:var(--lime2)}
+.ctrl .tm{font-size:12px;color:#cfe2d6;font-variant-numeric:tabular-nums;min-width:78px;text-align:right}
+.chapters{display:flex;flex-direction:column;gap:4px}
+.chapters button{display:flex;gap:10px;align-items:flex-start;border:0;background:none;text-align:left;padding:9px 10px;border-radius:10px}
+.chapters button:hover{background:var(--line2)}
+.chapters button.on{background:var(--lime)}
+.chapters .n{width:22px;height:22px;border-radius:50%;background:var(--line2);font-size:11px;font-weight:800;display:grid;place-items:center;flex:none}
+.chapters button.on .n{background:var(--green);color:#fff}
+.quiz-q{border-top:1px solid var(--line2);padding:18px 0}
+.quiz-q:first-of-type{border-top:0}
+.quiz-q b{display:block;margin-bottom:10px}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.opt{border:1px solid var(--line);background:#fff;border-radius:12px;padding:10px 12px;text-align:left;font-size:14px}
+.opt:hover{border-color:var(--lime2)}
+.opt.right{background:#e4f4ea;border-color:#9fd3b2}
+.opt.wrong{background:var(--redbg);border-color:#efb9b1}
+.why{margin-top:10px;font-size:13px;color:var(--muted);background:var(--bg);border-radius:10px;padding:8px 12px}
+/* feedback */
+.score{display:grid;grid-template-columns:96px 1fr 24px;align-items:center;gap:10px;font-size:13px;margin:6px 0}
+.meter{height:8px;border-radius:99px;background:var(--line2);overflow:hidden}
+.meter i{display:block;height:100%;background:var(--green3);border-radius:99px}
+.meter.low i{background:var(--orange)}
+.fbcard{border:1px solid var(--line);border-radius:16px;padding:16px;background:#fff}
+.fbcard+.fbcard{margin-top:12px}
+.fbcard .h{display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap}
+.fbcard .h small{color:var(--muted);margin-left:auto;font-size:12px}
+.fbcard p{margin:8px 0 0;font-size:14px}
+.adj{margin-top:12px;background:#fff6ef;border-radius:12px;padding:10px 12px;font-size:13px}
+.adj b{color:#b5541f;font-size:12px}
+.adj ul{margin:6px 0 0;padding-left:18px}
+.rate{display:flex;gap:6px}
+.rate label{position:relative}
+.rate input{position:absolute;opacity:0}
+.rate span{display:grid;place-items:center;width:38px;height:38px;border-radius:10px;border:1px solid var(--line);background:#fff;font-weight:800;cursor:pointer}
+.rate input:checked+span{background:var(--green);border-color:var(--green);color:#fff}
+.rate input:focus-visible+span{box-shadow:0 0 0 3px rgba(61,122,93,.3)}
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+.field>label,.field>.lab{font-size:12.5px;font-weight:700;color:#3c4741}
+.field .hint{font-size:12px;color:var(--muted)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.check{display:flex;align-items:center;gap:8px;font-size:14px}
+.check input{width:18px;height:18px;accent-color:var(--green)}
+.sugg{background:linear-gradient(180deg,#fff7f0,#fff);border:1px solid #f6d3bd;border-radius:18px;padding:20px;margin-bottom:18px}
+.sugg h3{display:flex;align-items:center;gap:8px;color:#9a4518}
+.sopt{display:flex;gap:12px;align-items:flex-start;background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px;margin-top:8px;cursor:pointer}
+.sopt input{margin-top:3px;width:18px;height:18px;accent-color:var(--orange);flex:none}
+.sopt b{display:block;font-size:14px}
+.sopt small{color:var(--muted)}
+/* tabs */
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:20px;overflow-x:auto}
+.tabs button{border:0;background:none;padding:11px 14px;font-weight:700;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap}
+.tabs button.on{color:var(--green);border-color:var(--green)}
+.tabs .cnt{background:var(--orange);color:#fff;border-radius:99px;font-size:11px;padding:0 6px;margin-left:4px}
+.spick{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+.spick button{display:flex;align-items:center;gap:8px;border:1px solid var(--line);background:#fff;border-radius:999px;padding:5px 14px 5px 5px;font-weight:700;font-size:14px}
+.spick button.on{border-color:var(--green);background:var(--lime)}
+.spick .avatar{width:28px;height:28px;font-size:11px}
+/* table */
+.tbl{width:100%;border-collapse:collapse;font-size:14px}
+.tbl th{text-align:left;font-size:12px;color:var(--muted);font-weight:700;padding:10px 12px;border-bottom:1px solid var(--line)}
+.tbl td{padding:12px;border-bottom:1px solid var(--line2);vertical-align:middle}
+.tbl tr.click{cursor:pointer}
+.tbl tr.click:hover td{background:var(--bg)}
+.who{display:flex;align-items:center;gap:10px}
+.who b{display:block}
+.who small{color:var(--muted);font-size:12px}
+.prog{display:flex;align-items:center;gap:8px;min-width:120px}
+.prog .meter{flex:1}
+/* session */
+.sess{display:flex;align-items:center;gap:14px;padding:14px;border:1px solid var(--line);border-radius:14px;background:#fff}
+.sess+.sess{margin-top:10px}
+.sess .when{width:62px;text-align:center;flex:none;border-right:1px solid var(--line2);padding-right:12px}
+.sess .when b{display:block;font-family:var(--head);font-size:20px;font-weight:800;line-height:1.1}
+.sess .when small{font-size:11px;color:var(--muted)}
+.sess .tx{flex:1;min-width:0}
+.sess .tx b{display:block}
+.sess .tx small{color:var(--muted);font-size:12.5px}
+.sess .acts{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.nextcall{background:linear-gradient(135deg,#eaf1ff,#fff);border:1px solid #cfe0fc;border-radius:20px;padding:22px}
+.nextcall .when{font-family:var(--head);font-size:24px;font-weight:800;margin:6px 0 2px}
+.nextcall .meta{color:var(--muted);font-size:14px;margin-bottom:14px}
+/* chat */
+.thread{display:flex;flex-direction:column;gap:10px;max-height:380px;overflow:auto;padding:4px 2px 10px}
+.msg{max-width:82%;padding:10px 13px;border-radius:16px;font-size:14px;background:var(--line2)}
+.msg small{display:block;font-size:11px;color:var(--soft);margin-top:4px}
+.msg.me{align-self:flex-end;background:var(--green);color:#fff;border-bottom-right-radius:4px}
+.msg.me small{color:#bcd5c7}
+.msg.them{border-bottom-left-radius:4px}
+.composer{display:flex;gap:8px;margin-top:10px}
+.composer input{flex:1}
+/* modal */
+.scrim{position:fixed;inset:0;background:rgba(23,35,29,.36);z-index:60;display:grid;place-items:center;padding:20px;animation:fin .15s}
+@keyframes fin{from{opacity:0}}
+.modal{background:#fff;border-radius:22px;width:min(560px,100%);max-height:calc(100vh - 40px);overflow:auto;padding:24px;box-shadow:0 30px 80px rgba(0,0,0,.2)}
+.modal .mh{display:flex;align-items:center;gap:10px;margin-bottom:18px}
+.modal .mh h3{font-size:20px}
+.modal .mh .icon-btn{margin-left:auto}
+.modal .mf{display:flex;gap:8px;justify-content:flex-end;margin-top:18px;flex-wrap:wrap}
+.modal .mf .l{margin-right:auto}
+.toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:11px 18px;border-radius:999px;font-size:14px;font-weight:500;z-index:80;box-shadow:0 10px 30px rgba(0,0,0,.2);animation:tin .2s}
+@keyframes tin{from{opacity:0;transform:translate(-50%,10px)}}
+.notice{display:flex;gap:10px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px 14px;font-size:13px;color:var(--muted)}
+.notice svg{flex:none;color:var(--green3);margin-top:2px}
+.logs{display:flex;flex-direction:column;gap:8px}
+.log{display:flex;gap:10px;font-size:13px;padding:9px 12px;background:#fff;border:1px solid var(--line2);border-radius:10px}
+.log small{color:var(--soft);margin-left:auto;white-space:nowrap}
+.tools{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.tool{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px}
+.tool h4{font-size:14px;margin-bottom:4px;display:flex;align-items:center;gap:6px}
+.tool p{font-size:12.5px;color:var(--muted);margin:0 0 12px}
+.tool .f{display:flex;gap:8px;margin-bottom:8px}
+.subrow{display:flex;gap:16px;flex-wrap:wrap;align-items:center;margin-bottom:20px;padding:14px 16px;background:#fff;border:1px solid var(--line);border-radius:16px}
+.subrow .k{font-size:12px;color:var(--muted)}
+.subrow .v{font-weight:700;font-size:14px}
+.subcard{border:1px solid var(--line);border-radius:16px;padding:16px;background:#fff}
+.subcard+.subcard{margin-top:12px}
+.answer{background:var(--bg);border-radius:12px;padding:12px;font-size:14px;white-space:pre-wrap;margin:10px 0}
+.onboard{max-width:520px;margin:10vh auto;text-align:center}
+.onboard .card{padding:32px}
+.bnav{display:none}
+@media (max-width:1100px){.kpis{grid-template-columns:repeat(2,1fr)}.tools{grid-template-columns:1fr}.grid2{grid-template-columns:1fr}}
+@media (max-width:900px){
+  .app{grid-template-columns:1fr}
+  .side{display:none}
+  .m-only{display:flex}
+  .top{padding:12px 16px}
+  .top .crumb{display:none}
+  .content{padding:20px 16px 110px}
+  .ptitle{font-size:27px}
+  .week{grid-template-columns:1fr}
+  .day{min-height:0}
+  .hero{flex-direction:column;align-items:flex-start;padding:22px}
+  .ring{margin-left:0;width:96px;height:96px}
+  .opts{grid-template-columns:1fr}
+  .row3{grid-template-columns:1fr}
+  .bnav{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:30;background:#fff;border-top:1px solid var(--line);padding:6px 6px calc(6px + env(safe-area-inset-bottom))}
+  .bnav button{flex:1;border:0;background:none;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:11px;font-weight:700;color:var(--muted);padding:6px 0;border-radius:10px}
+  .bnav button.on{color:var(--green);background:var(--lime)}
+  .tbl .hide-m{display:none}
+  .sess{flex-wrap:wrap}
+  .sess .acts{width:100%;justify-content:flex-start}
+  .top .btn span{display:none}
+  .who small{display:none}
+  .toast{bottom:92px}
+  .head-row .act{margin-left:0}
+}
+.m-roles{background:var(--line2);border-radius:999px;padding:3px}
+.m-roles button{border:0;background:none;border-radius:999px;padding:5px 10px;font-size:12px;font-weight:700;color:var(--muted)}
+.m-roles button.on{background:var(--green);color:#fff}
+.m-brand{font-family:var(--head);font-weight:800;color:var(--green);font-size:20px;align-items:center;gap:4px}
+.m-roles button{white-space:nowrap}
+.m-brand span{color:var(--orange)}
+.m-pick{max-width:120px;padding:6px 8px;font-size:13px}
+</style>
+</head>
+<body>
+<div id="app"><div class="onboard"><div class="card"><h2>NALA</h2><p class="muted">Loading…</p></div></div></div>
+
+<script id="demo">
+/* ===== Default content & demo data ===== */
+var SUBJECTS=[
+  {id:'math',name:'Mathematics',icon:'∑',tone:'sage'},
+  {id:'science',name:'Physical Sciences',icon:'↗',tone:'peach'},
+  {id:'english',name:'English',icon:'Aa',tone:'lavender'},
+  {id:'accounting',name:'Accounting',icon:'≡',tone:'blue'},
+  {id:'biology',name:'Life Sciences',icon:'✿',tone:'butter'}
+];
+var LESSONS=[
+  {id:'math-quad',subject:'math',title:'Factorising quadratic equations',minutes:14,video:'',summary:'An equation can look complicated until you notice the pattern hiding inside it.',
+   steps:[{t:'Start with the equation',f:'x² − 5x + 6 = 0',b:'We want two numbers whose product is +6 and whose sum is −5.'},{t:'Find the pair',f:'(−2) × (−3) = 6',b:'The numbers −2 and −3 also add up to −5. That gives us the two brackets.'},{t:'Solve both brackets',f:'x = 2  or  x = 3',b:'Set each bracket equal to zero. Check both values in the original equation.'}],
+   quiz:[{q:'Which factorisation is correct for x² + 5x + 6?',o:['(x + 1)(x + 6)','(x + 2)(x + 3)','(x − 2)(x − 3)','(x + 3)(x + 3)'],a:1,w:'2 × 3 = 6 and 2 + 3 = 5, so the brackets are (x + 2)(x + 3).'},{q:'Solve x² − 5x + 6 = 0.',o:['x = 2 or x = 3','x = −2 or x = −3','x = 1 or x = 6','x = 0 or x = 5'],a:0,w:'(x − 2)(x − 3) = 0, so either x − 2 = 0 or x − 3 = 0.'},{q:'A learner says x² − 9 = 0 has only one solution: x = 3. What did they miss?',o:['There are no real solutions.','x = −3 is also a solution.','x = 9 is the only solution.','The equation should equal 9.'],a:1,w:'Both 3² and (−3)² equal 9. Remember to check both factors.'}],
+   homework:'Solve x² − 7x + 12 = 0. Show your factorisation, give both solutions, and explain how you checked them.'},
+  {id:'math-linear',subject:'math',title:'Reading straight-line graphs',minutes:12,video:'',summary:'Know the gradient and the y-intercept, and you can sketch any straight line.',
+   steps:[{t:'What is the gradient?',f:'y = 2x + 1',b:'Each time x increases by 1, y increases by 2. That rate is the gradient.'},{t:'Find the y-intercept',f:'x = 0 → y = 1',b:'The graph crosses the y-axis at (0; 1). That point is the y-intercept.'},{t:'Sketch the line',f:'(0; 1) → (1; 3)',b:'Start at the y-intercept, move by the gradient, and join the points.'}],
+   quiz:[{q:'What is the gradient of y = −3x + 4?',o:['4','−3','3','−4'],a:1,w:'The coefficient of x is the gradient.'},{q:'What is the y-intercept of y = 2x − 5?',o:['2','5','−5','0'],a:2,w:'Substitute x = 0 to get y = −5.'}],
+   homework:'Sketch y = −x + 3 and explain where the gradient and the y-intercept appear on your graph.'},
+  {id:'sci-disp',subject:'science',title:'Distance vs displacement',minutes:12,video:'',summary:'Sometimes the distance you travel is not how far you end up from where you started.',
+   steps:[{t:'Follow the route',f:'8 m east + 3 m west',b:'Imagine walking 8 metres east, then turning around and walking 3 metres west.'},{t:'Add the full journey',f:'Distance = 8 + 3 = 11 m',b:'Distance counts each part of the path, regardless of direction.'},{t:'Compare start and finish',f:'Displacement = 5 m east',b:'You finish 5 metres east of where you started. Direction matters for displacement.'}],
+   quiz:[{q:'You walk 8 m east and 3 m west. What distance did you travel?',o:['5 m','8 m','11 m','24 m'],a:2,w:'Add both parts of the route: 8 + 3 = 11 metres.'},{q:'For the same walk, what is your displacement?',o:['11 m east','5 m east','5 m west','0 m'],a:1,w:'Taking east as positive gives +8 − 3 = +5 metres, or 5 m east.'},{q:'If you return to your starting point, your displacement is…',o:['equal to your distance','always negative','zero','always one metre'],a:2,w:'Your final and initial positions are the same, so the change in position is zero.'}],
+   homework:'A learner walks 12 m east and then 5 m west. Calculate the total distance and final displacement. Explain why the answers differ.'},
+  {id:'eng-main',subject:'english',title:'Finding the main idea',minutes:13,video:'',summary:'A good reader notices the big message as well as the little details.',
+   steps:[{t:'Read the title and first lines',f:'Topic → Main idea',b:'The title and opening paragraph give you the first clues about the topic.'},{t:'Spot repeated words',f:'Key words repeat',b:'Words that keep coming back point towards the main idea.'},{t:'Sum it up in one sentence',f:'“This text is mainly about…”',b:'Write one sentence that covers the whole text, not just one detail.'}],
+   quiz:[{q:'Which best describes the main idea of a text?',o:['The most interesting detail','The central message of the whole text','The first word of the text','The author’s name'],a:1,w:'The main idea is the central message that the whole text supports.'},{q:'Which is LEAST helpful for finding the main idea?',o:['The title','Repeated key words','A summary in the last paragraph','The font size'],a:3,w:'Font size tells you nothing about the content.'}],
+   homework:'Read a short news article and write its main idea in one sentence. List two key words that helped you decide.'},
+  {id:'acc-eq',subject:'accounting',title:'The accounting equation',minutes:12,video:'',summary:'Assets = Liabilities + Owner’s equity. After every transaction, both sides stay equal.',
+   steps:[{t:'Meet the equation',f:'Assets = Liabilities + Owner’s equity',b:'What a business owns (assets) is financed by what it owes (liabilities) and what the owner put in (equity).'},{t:'Record one transaction',f:'Owner invests R1 000 cash',b:'When the owner puts in cash, assets (cash) and owner’s equity both increase.'},{t:'Check the balance',f:'R1 000 = R0 + R1 000',b:'After any transaction, both sides of the equation must still be equal.'}],
+   quiz:[{q:'A business buys equipment for R300 cash. What happens?',o:['Total assets increase','Total assets stay the same','Liabilities increase','Owner’s equity decreases'],a:1,w:'Cash decreases by R300 but equipment increases by R300, so total assets remain unchanged.'},{q:'The business takes a R200 loan. What happens?',o:['Assets and liabilities both increase','Only equity increases','Only assets decrease','Nothing changes'],a:0,w:'Cash (an asset) and the loan (a liability) both increase by R200.'}],
+   homework:'A learner starts a business using R800 of their own cash and a R200 loan. The business then buys R300 of stock with cash. State the final assets, liabilities and owner’s equity, and check the equation.'},
+  {id:'bio-cell',subject:'biology',title:'Inside a living cell',minutes:12,video:'',summary:'Every living thing is made from cells. Each part has a different job.',
+   steps:[{t:'Meet the cell membrane',f:'Boundary and exchange',b:'The membrane separates the cell from its surroundings and regulates movement of many substances.'},{t:'Look inside',f:'Nucleus and cytoplasm',b:'The nucleus contains most of the cell’s genetic material. Many cellular processes take place in the cytoplasm.'},{t:'Compare plant and animal cells',f:'A cell wall supports plant cells',b:'Plant cells have a cellulose cell wall outside the membrane; animal cells do not.'}],
+   quiz:[{q:'Which structure regulates the movement of many substances into and out of a cell?',o:['Cell membrane','Cell wall only','Nucleus','Vacuole'],a:0,w:'The cell membrane forms a selectively permeable boundary.'},{q:'Which structure is found in plant cells but not in animal cells?',o:['Cytoplasm','Cell membrane','Cellulose cell wall','Nucleus'],a:2,w:'Plant cells have a cellulose cell wall; animal cells do not.'}],
+   homework:'Draw a labelled plant or animal cell. Write one function each for the membrane, cytoplasm and nucleus, and give one difference between plant and animal cells.'}
+];
+function _ymd(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+function _parse(s){var p=s.split('-').map(Number);return new Date(p[0],p[1]-1,p[2])}
+function _add(s,n){var d=_parse(s);d.setDate(d.getDate()+n);return _ymd(d)}
+function _ws(s){var d=_parse(s);d.setDate(d.getDate()-((d.getDay()+6)%7));return _ymd(d)}
+function buildDemo(today){
+  var ws=_ws(today), n=0, D=function(i){return _add(ws,i)};
+  var id=function(p){n++;return p+n.toString(36)+Math.random().toString(36).slice(2,6)};
+  var L=function(lid){return LESSONS.filter(function(l){return l.id===lid})[0]};
+  function T(date,lid,type,extra){var l=L(lid);var t={id:id('t'),date:date,subject:l.subject,type:type,lessonId:lid,title:type==='lesson'?l.title:type==='homework'?l.title+' – homework':l.title+' – review',detail:type==='homework'?l.homework:type==='lesson'?l.summary:'Summarise the key points in three lines in your notebook.',minutes:type==='lesson'?l.minutes:type==='homework'?25:10,status:'todo',answer:'',review:'',origin:'plan',fbId:''};for(var k in extra)t[k]=extra[k];if(date<today&&!extra||date<today&&extra&&!extra.status)t.status='done';return t}
+  var students=[
+    {id:'s1',name:'Thandi Mokoena',grade:'Grade 10',goal:'Reach Level 6 in Mathematics',tone:'sage',meet:'',note:'Picks up concepts quickly but often skips checking her answers'},
+    {id:'s2',name:'Sipho Dlamini',grade:'Grade 10',goal:'Build strong science foundations',tone:'peach',meet:'',note:'Hesitant to ask questions · responds well to diagrams'},
+    {id:'s3',name:'Ayesha Patel',grade:'Grade 10',goal:'Read English texts with confidence',tone:'lavender',meet:'',note:'Consistent · enjoys extension work'}
+  ];
+  var fb2=id('f');
+  var data={
+    s1:{tasks:[
+      T(D(0),'math-quad','lesson'),T(D(1),'math-quad','homework',{status:D(1)<today?'submitted':'todo',answer:D(1)<today?'(x − 3)(x − 4) = 0, so x = 3 or x = 4\nCheck: 9 − 21 + 12 = 0 and 16 − 28 + 12 = 0':'',submittedAt:D(1)}),
+      T(D(2),'math-linear','lesson'),T(D(3),'math-linear','homework'),T(D(4),'acc-eq','lesson'),T(D(5),'math-quad','review',{title:'Weekly corrections',detail:'Redo the questions you got wrong and write one line on why each mistake happened.',minutes:20})],
+      feedback:[],sessions:[{id:id('m'),date:_add(today,1),time:'17:00',minutes:40,topic:'Factorisation corrections',meet:'',status:'scheduled',notes:''},{id:id('m'),date:_add(today,-6),time:'17:00',minutes:40,topic:'Setting learning goals',meet:'',status:'done',notes:'Goal: Level 6 in Maths. Agreed on a 30-minute daily maths routine.'}],
+      messages:[{id:id('c'),from:'student',text:'Hi Ms Khumalo, I keep mixing up the signs in x² − 7x + 12 😢',at:_add(today,-1)+'T21:10'},{id:id('c'),from:'mentor',text:'If the product is positive and the sum is negative, both numbers are negative! Let’s go through it on our call.',at:_add(today,-1)+'T21:40'}],
+      progress:{'math-quad':{done:true,score:3,total:3}},logs:[]},
+    s2:{tasks:[
+      T(D(0),'sci-disp','lesson',{status:'todo'}),T(D(1),'sci-disp','homework',{status:'todo'}),T(D(2),'bio-cell','lesson'),
+      T(_add(today,1),'sci-disp','lesson',{title:'[Review] Distance vs displacement',origin:'feedback',fbId:fb2,detail:'From feedback: revisit direction in displacement'}),
+      T(_add(today,2),'sci-disp','homework',{title:'3 extra displacement problems',origin:'feedback',fbId:fb2,detail:'For three journeys that change direction, calculate both distance and displacement.',minutes:20}),
+      T(D(4),'bio-cell','homework')],
+      feedback:[{id:fb2,date:_add(today,-1),subject:'science',scores:{understanding:2,completion:2,effort:4},focus:'Direction (+/−) in displacement',comment:'You are putting in great effort! You are still treating distance and displacement as the same thing. Try drawing each journey and marking the direction.',share:true,adjustments:['Review video added – Physical Sciences','Extra homework added (3 displacement problems)']}],
+      sessions:[{id:id('m'),date:today,time:'19:30',minutes:30,topic:'Revisiting displacement',meet:'',status:'scheduled',notes:''}],
+      messages:[],progress:{},logs:[{id:id('g'),at:_add(today,-1)+'T20:05',text:'From feedback · Added [Review] Distance vs displacement',fbId:fb2},{id:id('g'),at:_add(today,-1)+'T20:05',text:'From feedback · Added 3 extra displacement problems',fbId:fb2}]},
+    s3:{tasks:[
+      T(D(0),'eng-main','lesson'),T(D(1),'eng-main','homework',{status:D(1)<today?'redo':'todo',answer:D(1)<today?'The text is about recycling.':'',review:D(1)<today?'Good topic! Now say what the text tells us about recycling in the same sentence. You also left out the two key words.':''}),
+      T(D(2),'bio-cell','lesson'),T(D(3),'eng-main','review'),T(D(4),'bio-cell','homework')],
+      feedback:[],sessions:[{id:id('m'),date:_add(D(7),1),time:'18:00',minutes:30,topic:'Reading strategies check-in',meet:'',status:'scheduled',notes:''}],
+      messages:[],progress:{'eng-main':{done:true,score:2,total:2}},logs:[]}
+  };
+  return {config:{v:2,mentor:{name:'Ms Naledi Khumalo'},students:students,lessons:LESSONS},learners:data};
+}
+if(typeof module!=='undefined')module.exports={buildDemo:buildDemo,LESSONS:LESSONS};
+</script>
+
+<script>
+/* ===== Utilities ===== */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid=p=>p+Date.now().toString(36).slice(-4)+Math.random().toString(36).slice(2,7);
+const ymd=_ymd,parse=_parse,addDays=_add,weekStart=_ws;
+const TODAY=()=>ymd(new Date());
+const WD=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const DOW=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+const DOWL=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+const fmtD=s=>{const d=parse(s);return `${WD[d.getDay()]} ${d.getDate()} ${MON[d.getMonth()]}`};
+const shortD=s=>{const d=parse(s);return `${d.getDate()} ${MON[d.getMonth()]}`};
+const relD=s=>{const t=TODAY();if(s===t)return 'Today';if(s===addDays(t,1))return 'Tomorrow';if(s===addDays(t,-1))return 'Yesterday';return fmtD(s)};
+const nowHM=()=>{const d=new Date();return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')};
+const fmtAt=a=>{if(!a)return '';const [d,t]=a.split('T');return relD(d)+(t?' '+t.slice(0,5):'')};
+const nowAt=()=>TODAY()+'T'+nowHM();
+const SUB=id=>SUBJECTS.find(s=>s.id===id)||{id,name:id,icon:'•',tone:'sage'};
+const TYPES={lesson:'Video lesson',homework:'Homework',review:'Review',quiz:'Quiz'};
+const STATUS={todo:'To do',submitted:'Awaiting review',done:'Done',redo:'Resubmit'};
+const TONES=['sage','peach','lavender','blue','butter'];
+const plural=(n,w,p)=>n+' '+(n===1?w:(p||w+'s'));
+const IC={home:'<path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>',play:'<path d="M7 4.5v15l13-7.5z" fill="currentColor"/>',cal:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>',chat:'<path d="M4 5h16v11H9l-5 4z"/>',video:'<rect x="2.5" y="6" width="13" height="12" rx="2"/><path d="m15.5 10.5 6-3.5v10l-6-3.5"/>',users:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.3-5.5 6.5-5.5s5.7 1.9 6.5 5.5M16 4.8a3.5 3.5 0 0 1 0 6.4M18 14.8c1.8.7 3 2.4 3.5 5.2"/>',inbox:'<path d="M3 13h5l1.5 3h5L16 13h5M5 5h14l2 8v6H3v-6z"/>',book:'<path d="M4 4.5h6a2 2 0 0 1 2 2V20a2 2 0 0 0-2-2H4zM20 4.5h-6a2 2 0 0 0-2 2V20a2 2 0 0 1 2-2h6z"/>',gear:'<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/>',plus:'<path d="M12 5v14M5 12h14"/>',check:'<path d="m5 12.5 4.5 4.5L19 7.5"/>',arrow:'<path d="M5 12h14M13 6l6 6-6 6"/>',left:'<path d="m15 6-6 6 6 6"/>',right:'<path d="m9 6 6 6-6 6"/>',clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',spark:'<path d="M12 3v4M12 17v4M3 12h4M17 12h4M5.6 5.6l2.8 2.8M15.6 15.6l2.8 2.8M5.6 18.4l2.8-2.8M15.6 8.4l2.8-2.8"/>',edit:'<path d="M4 20h4L19 9l-4-4L4 16z"/>',trash:'<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>',alert:'<path d="M12 3 2 20h20zM12 10v4M12 17v.5"/>',ext:'<path d="M14 4h6v6M20 4l-9 9M18 14v6H4V6h6"/>',pause:'<path d="M8 5v14M16 5v14"/>',send:'<path d="M4 12 20 4l-6 16-3-7z"/>',x:'<path d="M6 6l12 12M18 6 6 18"/>',flag:'<path d="M5 21V4h11l-2 4 2 4H5"/>',info:'<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8v.5"/>',copy:'<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3"/>',shift:'<path d="M4 12h12M12 7l5 5-5 5M20 5v14"/>',sliders:'<path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/>'};
+const icon=(n,s=18)=>`<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${IC[n]||''}</svg>`;
+const EMBED_OK=!(window.claude&&window.claude.use); // YouTube embeds only when hosted outside the artifact viewer
+const MEET_NEW='https://meet.google.com/new';
+const isMeet=u=>/^https:\/\/meet\.google\.com\/[a-z0-9-]+/i.test(u||'');
+const initials=n=>String(n||'?').trim().split(/\s+/).map(w=>w[0]).slice(0,2).join('').toUpperCase();
+const first=n=>String(n||'').trim().split(/\s+/)[0];
+
+/* ===== Storage (shared live database first, otherwise this browser) ===== */
+const KEY='nala-unified-en-v1',UKEY='nala-ui-en-v1';
+let C=null,L={},mode='boot',readOnly=false,DB=null,loadTimer=null,stale=false;
+const written={},queue={};
+function loadLocal(){try{const j=JSON.parse(localStorage.getItem(KEY)||'null');if(j&&j.C){C=j.C;L=j.L||{};return true}}catch(e){}return false}
+function saveLocal(){try{localStorage.setItem(KEY,JSON.stringify({C,L}))}catch(e){}}
+function persist(){
+  saveLocal();
+  if(!shared()||!C)return;
+  push('nala/config',C);
+  for(const sid in L)push('learners/'+sid,L[sid]);
+}
+function push(path,obj){const j=JSON.stringify(obj);if(written[path]===j)return;written[path]=j;const q=queue[path]||(queue[path]={busy:false,next:null});q.next=j;if(!q.busy)drain(path)}
+async function drain(path){const q=queue[path];q.busy=true;while(q.next!==null){const j=q.next;q.next=null;let tries=0;while(true){try{await writeDoc(path,j);break}catch(e){const c=e&&e.code;if(c==='unavailable'&&tries<1){tries++;await new Promise(r=>setTimeout(r,700+Math.random()*900));continue}if(c==='invalid_argument'){readOnly=true;toast('You have view-only access, so changes are not saved')}else if(c==='quota_exceeded'){toast('Storage is full. Please clear out some old records')}else toast('Could not save ('+(c||'error')+')');break}}}q.busy=false}
+async function removeDoc(path){delete written[path];if(mode==='cloud'){try{await DB.doc(path).delete()}catch(e){}}else if(mode==='api'){try{await fetch(API+'?path='+encodeURIComponent(path),{method:'DELETE'})}catch(e){}}}
+const shared=()=>mode==='cloud'||mode==='api';
+/* Vercel API (Upstash Redis) storage: used when hosted on Vercel with storage connected */
+const API='/api/state';
+async function writeDoc(path,j){if(mode==='cloud')return DB.doc(path).set({json:j,at:Date.now()});const r=await fetch(API+'?path='+encodeURIComponent(path),{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({json:j})});if(!r.ok){const e=new Error('api');e.code=r.status>=500?'unavailable':'http_'+r.status;throw e}}
+function busy(p){return queue[p]&&(queue[p].busy||queue[p].next!==null)}
+function applyDocs(docs,initial){let ch=false;const cj=docs['nala/config'];
+  if(cj===undefined){if(initial){C=null;ch=true}}else if(cj!==written['nala/config']&&!busy('nala/config')){try{C=JSON.parse(cj);written['nala/config']=cj;ch=true}catch(e){}}
+  const ids=new Set();for(const p in docs){if(!p.startsWith('learners/'))continue;const id=p.slice(9);ids.add(id);if(docs[p]===written[p]||busy(p))continue;try{L[id]=JSON.parse(docs[p]);written[p]=docs[p];ch=true}catch(e){}}
+  for(const id of Object.keys(L)){const p='learners/'+id;if(!ids.has(id)&&written[p]!==undefined&&!busy(p)){delete L[id];delete written[p];ch=true}}
+  return ch}
+async function tryApi(){if(location.protocol==='file:')return false;try{const ctl=new AbortController();const t=setTimeout(()=>ctl.abort(),5000);const r=await fetch(API,{cache:'no-store',signal:ctl.signal});clearTimeout(t);if(!r.ok)return false;const j=await r.json();if(!j||!j.enabled)return false;mode='api';applyDocs(j.docs||{},true);ensureUI();render();setInterval(pollApi,4000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)pollApi()});return true}catch(e){return false}}
+let polling=false;
+async function pollApi(){if(polling||document.hidden)return;polling=true;let was=stale;try{const r=await fetch(API,{cache:'no-store'});if(r.ok){const j=await r.json();stale=false;if(j.enabled&&applyDocs(j.docs||{},false)){ensureUI();soft()}else if(was)soft()}else stale=true}catch(e){stale=true}if(stale&&!was)soft();polling=false}
+function startLocal(){mode='local';if(!loadLocal()){const d=buildDemo(TODAY());C=d.config;L=d.learners;saveLocal()}ensureUI();render()}
+async function boot(){
+  loadUI();
+  if(!(window.claude&&window.claude.use)){if(await tryApi())return;startLocal();return}
+  render();
+  let db=null;try{db=await window.claude.use('db')}catch(e){}
+  if(!db){startLocal();return}
+  DB=db;mode='cloud';let gotC=false,gotL=false;
+  loadTimer=setTimeout(()=>{stale=true;if(!gotC){loadLocal();ensureUI()}render()},10000);
+  const done=()=>{if(gotC&&gotL){clearTimeout(loadTimer);stale=false}};
+  DB.doc('nala/config').onSnapshot(s=>{
+    if(!s.metadata.fromCache){gotC=true;done()}
+    if(!s.exists){if(!s.metadata.fromCache){C=null;render()}return}
+    const j=s.data().json;if(j===written['nala/config']&&C)return;written['nala/config']=j;
+    try{C=JSON.parse(j)}catch(e){return}ensureUI();soft();
+  },e=>{gotC=true;clearTimeout(loadTimer);mode='local';if(!C)startLocal();else{ensureUI();render()}});
+  DB.collection('learners').onSnapshot(qs=>{
+    if(!qs.metadata.fromCache){gotL=true;done()}
+    let ch=false;
+    qs.docChanges().forEach(c=>{const id=c.doc.id,p='learners/'+id;if(c.type==='removed'){if(!(queue[p]&&queue[p].busy)){delete L[id];ch=true}return}const j=c.doc.data().json;if(j===written[p])return;written[p]=j;try{L[id]=JSON.parse(j);ch=true}catch(e){}});
+    if(ch)soft();
+  },e=>{gotL=true;done()});
+}
+function canWrite(){if(readOnly){toast('You have view-only access, so this can’t be changed');return false}return true}
+function commit(msg){persist();render();if(msg)toast(msg)}
+function LS(sid){if(!L[sid])L[sid]={tasks:[],feedback:[],sessions:[],messages:[],progress:{},logs:[]};const x=L[sid];['tasks','feedback','sessions','messages','logs'].forEach(k=>x[k]=x[k]||[]);x.progress=x.progress||{};return x}
+function student(id){return (C&&C.students||[]).find(s=>s.id===id)}
+function lesson(id){return (C&&C.lessons||[]).find(l=>l.id===id)}
+function addLog(sid,text,fbId){LS(sid).logs.unshift({id:uid('g'),at:nowAt(),text,fbId:fbId||''});LS(sid).logs=LS(sid).logs.slice(0,60)}
+
+/* ===== View state ===== */
+const U={role:'student',sid:null,view:'home',aview:'overview',asid:null,atab:'plan',week:0,modal:null,lessonId:null,player:null,quiz:{},pendingFb:null,lib:'all',toast:null,tview:'steps'};
+function loadUI(){try{Object.assign(U,JSON.parse(localStorage.getItem(UKEY)||'{}'),{modal:null,player:null,toast:null,pendingFb:null})}catch(e){}}
+function saveUI(){try{localStorage.setItem(UKEY,JSON.stringify({role:U.role,sid:U.sid,view:U.view==='lesson'?'lessons':U.view,aview:U.aview,asid:U.asid,atab:U.atab}))}catch(e){}}
+function ensureUI(){if(!C)return;const ids=C.students.map(s=>s.id);if(!ids.includes(U.sid))U.sid=ids[0]||null;if(!ids.includes(U.asid))U.asid=ids[0]||null}
+
+/* ===== Render ===== */
+const app=document.getElementById('app');
+function soft(){ // remote change: redraw while keeping typed values and scroll position
+  const vals={};let focus=null;
+  app.querySelectorAll('form[data-form] [name]').forEach(el=>{const f=el.form&&el.form.dataset.form;if(!f)return;const k=f+'|'+el.name+'|'+(el.type==='radio'||el.type==='checkbox'?el.value:'');vals[k]=(el.type==='radio'||el.type==='checkbox')?el.checked:el.value;if(el===document.activeElement)focus={k,s:el.selectionStart,e:el.selectionEnd}});
+  const y=window.scrollY;render(true);
+  app.querySelectorAll('form[data-form] [name]').forEach(el=>{const f=el.form.dataset.form;const k=f+'|'+el.name+'|'+(el.type==='radio'||el.type==='checkbox'?el.value:'');if(k in vals){if(el.type==='radio'||el.type==='checkbox')el.checked=vals[k];else el.value=vals[k]}if(focus&&focus.k===k){el.focus();try{el.setSelectionRange(focus.s,focus.e)}catch(e){}}});
+  window.scrollTo(0,y);
+}
+function render(isSoft){
+  if(mode==='boot'){app.innerHTML=`<div class="onboard"><div class="card"><div class="brand" style="justify-content:center">NALA <span class="ast">✳</span></div><p class="muted">Connecting your learning space…</p></div></div>`;return}
+  if(!C){app.innerHTML=onboard();return}
+  ensureUI();saveUI();
+  let content='';
+  if(U.role==='student'){
+    if(!U.sid)content=`<div class="empty">No learners yet. Add a learner from the Admin tab.</div>`;
+    else content=U.view==='lessons'?sLessons():U.view==='lesson'?sLesson():U.view==='plan'?sPlan():U.view==='mentor'?sMentor():sHome();
+  }else{
+    content=U.aview==='student'?aStudent():U.aview==='sessions'?aSessions():U.aview==='library'?aLibrary():U.aview==='settings'?aSettings():aOverview();
+  }
+  app.innerHTML=shell(content);
+  if(U.view==='lesson'&&U.role==='student')tickUI();
+  if(!isSoft){const th=app.querySelector('.thread');if(th)th.scrollTop=th.scrollHeight}
+}
+function onboard(){return `<div class="onboard"><div class="card"><div class="brand" style="justify-content:center;font-size:30px">NALA <span class="ast">✳</span></div><h2 style="margin:14px 0 6px">Your learning space is empty</h2><p class="muted">There’s no data in the shared store yet. Start with demo learners, plans and lessons, or start from scratch.</p><div style="display:flex;gap:8px;justify-content:center;margin-top:18px;flex-wrap:wrap"><button class="btn pri" data-a="seed" data-v="demo">${icon('spark')} Start with demo data</button><button class="btn" data-a="seed" data-v="empty">Start empty</button></div></div></div>`}
+
+function navDefs(){
+  if(U.role==='student'){const pend=U.sid?LS(U.sid).tasks.filter(t=>t.date===TODAY()&&t.status!=='done'&&t.status!=='submitted').length:0;
+    return [['home','home','Home',pend],['lessons','play','Lessons'],['plan','cal','My plan'],['mentor','chat','Mentoring']]}
+  const wait=(C.students||[]).reduce((a,s)=>a+LS(s.id).tasks.filter(t=>t.status==='submitted').length,0);
+  return [['overview','home','Overview'],['student','users','Learners',wait],['sessions','video','Sessions'],['library','book','Lesson library'],['settings','gear','Settings']];
+}
+function curNav(){return U.role==='student'?(U.view==='lesson'?'lessons':U.view):U.aview}
+function shell(content){
+  const st=U.role==='student',navs=navDefs(),cur=curNav();
+  const me=st?student(U.sid):null;
+  const title=(navs.find(n=>n[0]===cur)||[])[2]||'';
+  return `<div class="app">
+  <aside class="side">
+    <div class="brand">NALA <span class="ast">✳</span><small>${st?'Learner':'Admin'}</small></div>
+    <div class="roles" role="tablist">${roleBtn('student','Learner space')}${roleBtn('admin','Admin')}</div>
+    ${st?`<div class="picker"><label for="sp">VIEWING AS</label><select id="sp" data-change="sid">${C.students.map(s=>`<option value="${s.id}" ${s.id===U.sid?'selected':''}>${esc(s.name)} · ${esc(s.grade)}</option>`).join('')}</select></div>`:''}
+    <nav class="nav"><div class="nav-label">${st?'MY LEARNING':'MANAGE'}</div>${navs.map(([id,ic,name,cnt])=>`<button class="${cur===id?'on':''}" data-a="nav" data-v="${id}">${icon(ic)}<span>${name}</span>${cnt?`<span class="cnt">${cnt}</span>`:''}</button>`).join('')}</nav>
+    <div class="side-foot">${syncBox()}</div>
+  </aside>
+  <main class="main">
+    <header class="top">
+      <div class="m-only m-brand">NALA<span>✳</span></div>
+      <div class="crumb">${st?'Learner space':'Admin'} / <b>${esc(title)}</b></div>
+      <div class="top-r">
+        <div class="m-only m-roles">${['student','admin'].map(r=>`<button class="${U.role===r?'on':''}" data-a="role" data-v="${r}">${r==='student'?'Learner':'Admin'}</button>`).join('')}</div>
+        ${st&&C.students.length?`<select class="m-only m-pick" data-change="sid" aria-label="Choose learner">${C.students.map(s=>`<option value="${s.id}" ${s.id===U.sid?'selected':''}>${esc(first(s.name))}</option>`).join('')}</select>`:''}
+        ${st&&me?callBtn(me):''}
+        ${!st?`<a class="btn sm" href="${MEET_NEW}" target="_blank" rel="noopener noreferrer">${icon('video',16)}<span>New Meet</span></a>`:''}
+        ${st&&me?avatar(me):`<div class="avatar" style="background:var(--green);color:#fff">${esc(initials(C.mentor.name.replace(/^(Ms|Mr|Mrs|Dr)\.?\s+/,'')))}</div>`}
+      </div>
+    </header>
+    <div class="content">${stale?`<div class="notice" style="margin-bottom:16px">${icon('alert')}<span>Not connected to the shared store yet. What you see may be out of date.</span></div>`:''}${content}</div>
+  </main>
+  <nav class="bnav">${navs.map(([id,ic,name])=>`<button class="${cur===id?'on':''}" data-a="nav" data-v="${id}">${icon(ic,20)}${name}</button>`).join('')}</nav>
+  ${U.modal?modal():''}
+  ${U.toast?`<div class="toast" role="status">${esc(U.toast)}</div>`:''}
+</div>`;
+}
+function roleBtn(r,l){return `<button class="${U.role===r?'on':''}" data-a="role" data-v="${r}">${l}</button>`}
+function avatar(s,size){return `<div class="avatar t-${s.tone||'sage'}" ${size?`style="width:${size}px;height:${size}px"`:''}>${esc(initials(s.name))}</div>`}
+function syncBox(){
+  if(shared()&&!stale)return `<div class="sync"><span class="dot live"></span><div><b>Live sync on</b>Admin changes appear on learner screens instantly${readOnly?' · view only':''}</div></div>`;
+  if(shared())return `<div class="sync"><span class="dot warn"></span><div><b>Waiting to connect</b>Data may be out of date</div></div>`;
+  return `<div class="sync"><span class="dot"></span><div><b>Saved in this browser</b>Learner and admin views share the same data</div></div>`;
+}
+function nextSession(sid){const now=TODAY()+'T'+nowHM();return LS(sid).sessions.filter(s=>s.status!=='done'&&(s.date+'T'+s.time)>=addMin(now,-90)).sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time))[0]}
+function addMin(at,m){const [d,t]=at.split('T');const dt=parse(d);const [h,mi]=t.split(':').map(Number);dt.setHours(h,mi+m);return ymd(dt)+'T'+String(dt.getHours()).padStart(2,'0')+':'+String(dt.getMinutes()).padStart(2,'0')}
+function linkFor(sid,sess){const s=student(sid);return (sess&&sess.meet)||(s&&s.meet)||''}
+function callBtn(me){const n=nextSession(me.id);const link=linkFor(me.id,n);
+  return link?`<a class="btn meet sm" href="${esc(link)}" target="_blank" rel="noopener noreferrer">${icon('video',16)}<span>Call my mentor</span></a>`
+  :`<button class="btn meet sm" data-a="nolink">${icon('video',16)}<span>Call my mentor</span></button>`}
+function meetBtn(sid,sess,label,cls){const link=linkFor(sid,sess);return link?`<a class="btn meet ${cls||''}" href="${esc(link)}" target="_blank" rel="noopener noreferrer">${icon('video',16)} ${label||'Join Google Meet'}</a>`:`<button class="btn meet off ${cls||''}" disabled title="No video link yet">${icon('video',16)} Link coming soon</button>`}
+function subjChip(id){const s=SUB(id);return `<span class="chip t-${s.tone}">${s.icon} ${s.name}</span>`}
+function whenTxt(s){return `${relD(s.date)} ${s.time}`}
+
+/* ===== Learner: Home ===== */
+function todayTasks(sid){return LS(sid).tasks.filter(t=>t.date===TODAY()).sort(taskOrder)}
+function taskOrder(a,b){const o={lesson:0,homework:1,quiz:2,review:3};return (o[a.type]??9)-(o[b.type]??9)}
+const isDone=t=>t.status==='done'||t.status==='submitted';
+function sHome(){
+  const me=student(U.sid),x=LS(U.sid),tt=todayTasks(U.sid);
+  const doneN=tt.filter(isDone).length,pct=tt.length?Math.round(doneN/tt.length*100):0,mins=tt.filter(t=>!isDone(t)).reduce((a,t)=>a+(+t.minutes||0),0);
+  const late=x.tasks.filter(t=>t.date<TODAY()&&(t.status==='todo'||t.status==='redo'));
+  const fb=x.feedback.filter(f=>f.share).sort((a,b)=>b.date.localeCompare(a.date))[0];
+  const ns=nextSession(U.sid);
+  const ws=weekStart(TODAY()),wk=x.tasks.filter(t=>t.date>=ws&&t.date<=addDays(ws,6)),wp=wk.length?Math.round(wk.filter(isDone).length/wk.length*100):0;
+  return `<div class="eyebrow">${fmtD(TODAY())} · Today’s learning</div>
+  <h1 class="ptitle">Good to see you, ${esc(first(me.name))} <span class="ast">✳</span></h1>
+  <p class="lead">Here’s the plan your mentor set for today. A little progress every day adds up.</p>
+  <div class="grid2"><div class="stack">
+    <section class="hero"><div style="position:relative;z-index:1">
+      <div class="tag">✦ TODAY</div>
+      <h2>${plural(tt.length,'thing')} to do today<br><em>${tt.length?(doneN===tt.length?'All done – well done!':'About '+mins+' minutes is enough'):'A rest day'}</em></h2>
+      <p>${tt.length?'Work through them one at a time, in the order your mentor set.':'When your mentor adds to your plan, it will show up here straight away.'}</p>
+      ${tt.some(t=>!isDone(t))?`<button class="btn lime" data-a="startToday">Let’s begin ${icon('arrow',16)}</button>`:`<button class="btn lime" data-a="nav" data-v="lessons">Browse lessons ${icon('arrow',16)}</button>`}
+    </div><div class="ring" style="--p:${pct}"><span>${pct}%<small>done today</small></span></div></section>
+    <section class="card"><div class="sec-t" style="margin-top:0"><h2>Today’s plan</h2><button class="btn sm ghost more" data-a="nav" data-v="plan">Whole week ${icon('arrow',14)}</button></div>
+      ${tt.length?`<div class="tlist">${tt.map(taskRow).join('')}</div>`:`<div class="empty">Nothing is planned for today.</div>`}
+      ${late.length?`<div class="notice" style="margin-top:14px;border-color:#f6d3bd;background:#fff8f3">${icon('alert')}<span>You have <b>${plural(late.length,'overdue task')}</b> from earlier days. <button class="btn xs" data-a="nav" data-v="plan">Take a look</button></span></div>`:''}
+    </section>
+  </div><div class="stack">
+    <section class="nextcall"><div class="eyebrow" style="color:#1a5fc9">Next mentoring session</div>
+      ${ns?`<div class="when">${whenTxt(ns)}</div><div class="meta">${esc(ns.topic)} · ${ns.minutes} min · ${esc(C.mentor.name)}</div>${meetBtn(U.sid,ns)}`:`<div class="when" style="font-size:18px">No session booked</div><div class="meta">Got a question? Leave a message for your mentor.</div><button class="btn sm" data-a="nav" data-v="mentor">${icon('chat',16)} Ask a question</button>`}
+    </section>
+    ${fb?`<section class="card"><h3>Mentor feedback ${subjChip(fb.subject)}</h3>${fbBody(fb,true)}</section>`:''}
+    <section class="card"><h3>This week’s progress</h3><div class="prog"><div class="meter"><i style="width:${wp}%"></i></div><b>${wp}%</b></div><p class="small muted" style="margin:8px 0 0">${wk.filter(isDone).length} of ${wk.length} done</p></section>
+  </div></div>`;
+}
+function taskRow(t){const s=SUB(t.subject);const done=isDone(t);
+  const act=t.type==='lesson'&&t.lessonId?`<button class="btn sm ${done?'':'pri'}" data-a="openLesson" data-id="${t.lessonId}">${icon('play',14)} ${done?'Watch again':'Start lesson'}</button>`
+   :t.type==='homework'?`<button class="btn sm ${t.status==='todo'||t.status==='redo'?'pri':''}" data-a="openTask" data-id="${t.id}">${t.status==='submitted'?'Awaiting review':t.status==='done'?'See result':t.status==='redo'?'Resubmit':'Submit'}</button>`
+   :`<button class="chk ${done?'on':''}" data-a="toggleTask" data-id="${t.id}" aria-label="Mark as done">${done?icon('check',14):''}</button>`;
+  return `<div class="trow ${done?'done':''}"><span class="ico t-${s.tone}">${s.icon}</span><div class="tx"><b>${esc(t.title)}</b><small>${TYPES[t.type]||t.type} · ${t.minutes} min ${t.origin==='feedback'?'· <span class="badge fb">From feedback</span>':''} ${t.status==='redo'?'<span class="badge redo">Resubmit</span>':''}</small></div>${act}</div>`}
+function fbBody(f,forStudent){const sc=f.scores||{};const row=(k,l)=>`<div class="score"><span>${l}</span><div class="meter ${sc[k]<=2?'low':''}"><i style="width:${(sc[k]||0)*20}%"></i></div><b>${sc[k]||'-'}</b></div>`;
+  return `${row('understanding','Understanding')}${row('completion','Completion')}${row('effort','Effort')}
+  ${f.focus?`<p class="small" style="margin:10px 0 0"><b>Focus area:</b> ${esc(f.focus)}</p>`:''}
+  ${f.comment?`<p style="margin:8px 0 0">${esc(f.comment)}</p>`:''}
+  ${f.adjustments&&f.adjustments.length?`<div class="adj"><b>${forStudent?'How this feedback changed your plan':'Adjustments applied'}</b><ul>${f.adjustments.map(a=>`<li>${esc(a)}</li>`).join('')}</ul></div>`:''}`}
+
+/* ===== Learner: Lessons ===== */
+function sLessons(){
+  const x=LS(U.sid),ws=weekStart(TODAY());
+  const assigned=new Set(x.tasks.filter(t=>t.lessonId&&t.type==='lesson'&&t.date>=ws&&t.date<=addDays(ws,6)).map(t=>t.lessonId));
+  const ls=C.lessons.filter(l=>U.lib==='all'||l.subject===U.lib);
+  return `<div class="eyebrow">Learn the concepts on video</div><h1 class="ptitle">Video <em>lessons</em></h1><p class="lead">Short video lessons, followed by a quick quiz to check you’ve got it.</p>
+  <div class="filters">${[['all','All'],...SUBJECTS.map(s=>[s.id,s.icon+' '+s.name])].map(([v,l])=>`<button class="${U.lib===v?'on':''}" data-a="lib" data-v="${v}">${l}</button>`).join('')}</div>
+  ${ls.length?`<div class="lgrid">${ls.map(l=>lessonCard(l,x.progress[l.id],assigned.has(l.id))).join('')}</div>`:`<div class="empty">No lessons for this subject yet.</div>`}`;
+}
+function lessonCard(l,p,asg){const s=SUB(l.subject);
+  return `<button class="lcard" data-a="openLesson" data-id="${l.id}"><div class="thumb t-${s.tone}">${esc((l.steps[0]||{}).f||l.title)}<span class="dur">${icon('clock',11)} ${l.minutes} min</span><span class="pl">${icon('play',18)}</span>${p&&p.done?`<span class="stamp badge ok">${icon('check',12)} Done ${p.total?p.score+'/'+p.total:''}</span>`:asg?`<span class="stamp badge fb">Set this week</span>`:''}</div>
+  <div class="lb">${subjChip(l.subject)}<b>${esc(l.title)}</b><small>${esc(l.summary||'')}</small></div></button>`}
+function segs(l){return [{t:l.title,f:'',b:l.summary||'',k:'intro'},...(l.steps||[]).map(s=>({t:s.t,f:s.f,b:s.b,k:'step'})),{t:'Wrap up, then check with the quiz',f:'✳',b:(l.steps||[]).map(s=>s.t).join(' → '),k:'end'}]}
+const SEG=10;
+function sLesson(){
+  const l=lesson(U.lessonId);if(!l){U.view='lessons';return sLessons()}
+  const P=U.player||(U.player={seg:0,t:0,playing:false,finished:false});const S=segs(l),cur=S[P.seg];
+  const yt=EMBED_OK&&ytId(l.video);
+  const p=LS(U.sid).progress[l.id];
+  return `<button class="btn sm ghost" data-a="nav" data-v="lessons" style="margin:-6px 0 10px -10px">${icon('left',16)} All lessons</button>
+  <div class="head-row"><div><div style="margin-bottom:6px">${subjChip(l.subject)}</div><h1 class="ptitle" style="margin:0">${esc(l.title)}</h1></div><div class="act">${l.video?`<a class="btn sm" href="${esc(l.video)}" target="_blank" rel="noopener noreferrer">${icon('ext',15)} Open original video</a>`:''}</div></div>
+  <div class="grid2"><div class="stack">
+    ${yt?`<div class="tabs" style="margin-bottom:0"><button class="${U.tview==='video'?'on':''}" data-a="tview" data-v="video">Video</button><button class="${U.tview!=='video'?'on':''}" data-a="tview" data-v="steps">Key-points player</button></div>`:''}
+    <div class="player">${yt&&U.tview==='video'?`<div class="screen"><iframe src="https://www.youtube-nocookie.com/embed/${yt}" title="${esc(l.title)}" allow="accelerometer; encrypted-media; picture-in-picture" allowfullscreen></iframe></div>`:`
+      <div class="screen"><div class="fade" id="pl-c"><div class="segno">${cur.k==='intro'?'INTRO':cur.k==='end'?'SUMMARY':'STEP '+P.seg}</div><h2>${esc(cur.t)}</h2>${cur.f?`<div class="formula">${esc(cur.f)}</div>`:''}<p>${esc(cur.b)}</p></div></div>
+      <div class="ctrl"><button class="pbtn" data-a="play" aria-label="${P.playing?'Pause':'Play'}">${icon(P.playing?'pause':'play',18)}</button>
+        <div class="bar">${S.map((s,i)=>`<button data-a="seg" data-v="${i}" aria-label="Part ${i+1}"><i id="pb-${i}" style="width:${i<P.seg?100:i===P.seg?P.t/SEG*100:0}%"></i></button>`).join('')}</div>
+        <span class="tm" id="pl-tm">${tmTxt(P,S)}</span></div>`}
+    </div>
+    <section class="card" id="quiz"><div class="sec-t" style="margin-top:0"><h2>Check your understanding</h2>${p&&p.done?`<span class="badge ok more">${icon('check',12)} Done · ${p.score}/${p.total}</span>`:''}</div>${quizHtml(l)}</section>
+  </div><div class="stack">
+    <section class="card"><h3>In this lesson</h3><div class="chapters">${S.map((s,i)=>`<button class="${i===P.seg?'on':''}" data-a="seg" data-v="${i}"><span class="n">${i+1}</span><span><b style="font-size:14px">${esc(s.t)}</b><br><small class="muted">${s.f?esc(s.f):''}</small></span></button>`).join('')}</div></section>
+    ${l.homework?`<section class="card"><h3>Linked homework</h3><p class="small" style="margin:0">${esc(l.homework)}</p></section>`:''}
+    ${!l.video?`<div class="notice">${icon('info')}<span>When your mentor adds a video link in the lesson library, an “Open original video” button will appear here.</span></div>`:''}
+  </div></div>`;
+}
+function ytId(u){const m=String(u||'').match(/(?:youtu\.be\/|v=|embed\/|shorts\/)([\w-]{11})/);return m?m[1]:''}
+function tmTxt(P,S){const tot=S.length*SEG,el=Math.min(tot,P.seg*SEG+P.t);const f=s=>Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0');return f(el)+' / '+f(tot)}
+let ticker=null;
+function tickUI(){clearInterval(ticker);if(!U.player||!U.player.playing)return;ticker=setInterval(()=>{const l=lesson(U.lessonId);if(!l||U.view!=='lesson'||!U.player||!U.player.playing){clearInterval(ticker);return}const P=U.player,S=segs(l);P.t+=0.2;if(P.t>=SEG){P.t=0;if(P.seg<S.length-1){P.seg++;render()}else{P.playing=false;P.finished=true;P.t=SEG;render();const q=document.getElementById('quiz');if(q)q.scrollIntoView({behavior:'smooth',block:'start'})}return}const b=document.getElementById('pb-'+P.seg);if(b)b.style.width=(P.t/SEG*100)+'%';const tm=document.getElementById('pl-tm');if(tm)tm.textContent=tmTxt(P,S)},200)}
+function quizHtml(l){const qs=l.quiz||[];if(!qs.length)return `<p class="muted small">This lesson has no quiz. Mark it as done when you’ve finished watching.</p><button class="btn pri" data-a="finishLesson">${icon('check',16)} Finish lesson</button>`;
+  const A=U.quiz;const answered=qs.filter((q,i)=>A[i]!=null).length;
+  return qs.map((q,i)=>`<div class="quiz-q"><b>${i+1}. ${esc(q.q)}</b><div class="opts">${q.o.map((o,j)=>{const cls=A[i]==null?'':j===q.a?'right':A[i]===j?'wrong':'';return `<button class="opt ${cls}" data-a="ans" data-q="${i}" data-o="${j}" ${A[i]!=null?'disabled':''}>${esc(o)}</button>`}).join('')}</div>${A[i]!=null?`<div class="why">${A[i]===q.a?'Correct! ':'Not quite. '}${esc(q.w)}</div>`:''}</div>`).join('')
+  +(answered===qs.length?`<div style="display:flex;gap:8px;align-items:center;margin-top:8px;flex-wrap:wrap"><b>${qs.filter((q,i)=>A[i]===q.a).length} / ${qs.length} correct</b><button class="btn sm" data-a="retry">Try again</button><button class="btn sm pri" data-a="nav" data-v="home">Back to today’s plan ${icon('arrow',14)}</button></div>`:'');}
+
+/* ===== Shared: weekly plan grid ===== */
+function weekGrid(sid,admin){
+  const ws=addDays(weekStart(TODAY()),U.week*7),x=LS(sid),t0=TODAY();
+  return `<div class="weekbar"><button class="icon-btn" data-a="week" data-v="-1" aria-label="Previous week">${icon('left',16)}</button><span class="lbl">${shortD(ws)} – ${shortD(addDays(ws,6))}</span><button class="icon-btn" data-a="week" data-v="1" aria-label="Next week">${icon('right',16)}</button>${U.week?`<button class="btn xs" data-a="week" data-v="0">This week</button>`:''}</div>
+  <div class="week">${DOW.map((dn,i)=>{const d=addDays(ws,i),ts=x.tasks.filter(t=>t.date===d).sort(taskOrder),mins=ts.reduce((a,t)=>a+(+t.minutes||0),0);
+    return `<div class="day ${d===t0?'today':''} ${d<t0?'past':''}"><div class="day-h"><b>${dn}</b><small>${shortD(d)}</small>${admin?`<button class="add" data-a="addTask" data-v="${d}" aria-label="Add a task on ${DOWL[i]}">${icon('plus',14)}</button>`:mins?`<span class="min">${mins} min</span>`:''}</div>
+    ${ts.map(t=>tcard(t,admin)).join('')||`<small class="muted" style="padding:4px;font-size:12px">${admin?'Use + to add a task':'—'}</small>`}</div>`}).join('')}</div>
+  <div class="legend"><span><i class="sdot"></i>To do</span><span><i class="sdot todo late"></i>Overdue</span><span><i class="sdot submitted"></i>Awaiting review</span><span><i class="sdot redo"></i>Resubmit</span><span><i class="sdot done"></i>Done</span><span><i style="width:3px;height:12px;background:var(--orange);display:inline-block"></i>From feedback</span><span><i style="width:3px;height:12px;background:var(--blue-i);display:inline-block"></i>Rescheduled</span></div>`;
+}
+function tcard(t,admin){const late=t.status==='todo'&&t.date<TODAY();return `<button class="tcard st-${t.status} o-${t.origin||'plan'}" data-a="${admin?'editTask':'openTask'}" data-id="${t.id}"><span class="tc-top">${subjChip(t.subject)}<i class="sdot st ${t.status} ${late?'late':''}" title="${STATUS[t.status]}"></i></span><b>${esc(t.title)}</b><small>${TYPES[t.type]||''} · ${t.minutes} min</small></button>`}
+
+/* ===== Learner: My plan ===== */
+function sPlan(){const x=LS(U.sid);
+  return `<div class="eyebrow">Your mentor’s curriculum</div><h1 class="ptitle">My <em>plan</em></h1><p class="lead">The lessons and homework your mentor set for each day. Tap a card to start or submit.</p>
+  ${weekGrid(U.sid,false)}
+  <div class="sec-t"><h2>Plan changes</h2></div>
+  ${x.logs.length?`<div class="logs">${x.logs.slice(0,6).map(g=>`<div class="log">${icon(g.fbId?'flag':'shift',16)}<span>${esc(g.text)}</span><small>${fmtAt(g.at)}</small></div>`).join('')}</div>`:`<div class="empty">No changes yet.</div>`}`}
+
+/* ===== Learner: Mentoring ===== */
+function sMentor(){const x=LS(U.sid),ns=nextSession(U.sid);
+  const up=x.sessions.filter(s=>s.status!=='done'&&s!==ns&&s.date>=TODAY()).sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time));
+  const past=x.sessions.filter(s=>s.status==='done').sort((a,b)=>b.date.localeCompare(a.date));
+  const fbs=x.feedback.filter(f=>f.share).sort((a,b)=>b.date.localeCompare(a.date));
+  return `<div class="eyebrow">With ${esc(C.mentor.name)}</div><h1 class="ptitle">Mentor<em>ing</em></h1><p class="lead">Online video sessions, questions and feedback, all in one place.</p>
+  <div class="grid2"><div class="stack">
+    <section class="nextcall"><div class="eyebrow" style="color:#1a5fc9">Next video session</div>
+      ${ns?`<div class="when">${whenTxt(ns)}</div><div class="meta">${esc(ns.topic)} · ${ns.minutes} min</div><div style="display:flex;gap:8px;flex-wrap:wrap">${meetBtn(U.sid,ns)}</div><p class="small muted" style="margin:12px 0 0">The button opens Google Meet in a new tab. Please join 5 minutes early.</p>`:`<div class="when" style="font-size:18px">No session booked</div><div class="meta">Need one? Ask your mentor below.</div>`}
+    </section>
+    ${up.length?`<section class="card"><h3>Upcoming sessions</h3>${up.map(s=>sessRow(s,false)).join('')}</section>`:''}
+    <section class="card"><h3>Ask your mentor</h3>${thread(U.sid,'student')}</section>
+  </div><div class="stack">
+    <section class="card"><h3>Feedback</h3>${fbs.length?fbs.map(f=>`<div class="fbcard"><div class="h">${subjChip(f.subject)}<small>${fmtD(f.date)}</small></div>${fbBody(f,true)}</div>`).join(''):`<div class="empty">No feedback yet.</div>`}</section>
+    ${past.length?`<section class="card"><h3>Past sessions</h3>${past.map(s=>`<div class="fbcard"><div class="h"><b>${esc(s.topic)}</b><small>${fmtD(s.date)}</small></div>${s.notes?`<p class="small">${esc(s.notes)}</p>`:''}</div>`).join('')}</section>`:''}
+  </div></div>`}
+function thread(sid,me){const ms=LS(sid).messages;return `<div class="thread">${ms.length?ms.map(m=>`<div class="msg ${m.from===me?'me':'them'}">${esc(m.text)}<small>${m.from==='mentor'?esc(C.mentor.name):esc(student(sid).name)} · ${fmtAt(m.at)}</small></div>`).join(''):`<div class="empty">No messages yet.</div>`}</div>
+  <form class="composer" data-form="msg" data-sid="${sid}" data-from="${me}"><input type="text" name="text" placeholder="${me==='student'?'Ask a question…':'Reply to your learner…'}" autocomplete="off" required><button class="btn pri" aria-label="Send">${icon('send',16)}</button></form>`}
+function sessRow(s,admin,sid){const d=parse(s.date);const st=student(sid||U.sid);
+  return `<div class="sess"><div class="when"><small>${MON[d.getMonth()]} · ${WD[d.getDay()]}</small><b>${d.getDate()}</b><small>${s.time}</small></div><div class="tx"><b>${esc(s.topic)}</b><small>${admin&&st?esc(st.name)+' · ':''}${s.minutes} min ${s.status==='done'?'· <span class="badge ok">Done</span>':s.date===TODAY()?'· <span class="badge live">Today</span>':''} ${linkFor(sid||U.sid,s)?'':'· <span class="badge redo">No link</span>'}</small></div>
+  <div class="acts">${s.status!=='done'?meetBtn(sid||U.sid,s,'Join','sm'):''}${admin?`${s.status!=='done'?`<button class="btn sm" data-a="doneSession" data-sid="${sid}" data-id="${s.id}">Mark done</button>`:''}<button class="icon-btn" data-a="editSession" data-sid="${sid}" data-id="${s.id}" aria-label="Edit">${icon('edit',15)}</button>`:''}</div></div>`}
+
+/* ===== Admin: Overview ===== */
+function stats(sid){const x=LS(sid),ws=weekStart(TODAY()),wk=x.tasks.filter(t=>t.date>=ws&&t.date<=addDays(ws,6));
+  const late=x.tasks.filter(t=>t.date<TODAY()&&(t.status==='todo'||t.status==='redo')).length;const wait=x.tasks.filter(t=>t.status==='submitted').length;
+  const lf=x.feedback.slice().sort((a,b)=>b.date.localeCompare(a.date))[0];
+  const flag=late>=2||(lf&&lf.scores.understanding<=2&&lf.date>=addDays(TODAY(),-14));
+  return {wk:wk.length,wd:wk.filter(isDone).length,pct:wk.length?Math.round(wk.filter(isDone).length/wk.length*100):0,late,wait,lf,flag,ns:nextSession(sid)}}
+function aOverview(){
+  const ss=C.students,st=ss.map(s=>({s,...stats(s.id)}));
+  const tot=st.reduce((a,b)=>a+b.wk,0),dn=st.reduce((a,b)=>a+b.wd,0),wait=st.reduce((a,b)=>a+b.wait,0);
+  const todayS=ss.flatMap(s=>LS(s.id).sessions.filter(x=>x.date===TODAY()&&x.status!=='done').map(x=>({...x,sid:s.id}))).sort((a,b)=>a.time.localeCompare(b.time));
+  const waits=ss.flatMap(s=>LS(s.id).tasks.filter(t=>t.status==='submitted').map(t=>({...t,sid:s.id})));
+  return `<div class="eyebrow">${fmtD(TODAY())}</div><div class="head-row"><div><h1 class="ptitle">Admin <em>dashboard</em></h1><p class="lead">See how each learner is doing, and manage plans, feedback and mentoring in one place.</p></div><div class="act"><button class="btn" data-a="addStudent">${icon('plus',16)} Add learner</button><button class="btn pri" data-a="addSession">${icon('video',16)} Book a session</button></div></div>
+  <div class="kpis"><div class="kpi hl"><small>Learners</small><b>${ss.length}</b></div><div class="kpi"><small>Tasks done this week</small><b>${tot?Math.round(dn/tot*100):0}%</b></div><div class="kpi"><small>Awaiting review</small><b>${wait}</b></div><div class="kpi"><small>Sessions today</small><b>${todayS.length}</b></div></div>
+  <div class="sec-t"><h2>Learners</h2></div>
+  <div class="card" style="padding:6px 8px;overflow-x:auto">${ss.length?`<table class="tbl"><thead><tr><th>Learner</th><th>This week</th><th class="hide-m">Latest feedback</th><th class="hide-m">Next session</th><th>Status</th></tr></thead><tbody>${st.map(r=>`<tr class="click" data-a="openStudent" data-id="${r.s.id}"><td><div class="who">${avatar(r.s)}<div><b>${esc(r.s.name)}</b><small>${esc(r.s.grade)} · ${esc(r.s.goal||'')}</small></div></div></td><td><div class="prog"><div class="meter"><i style="width:${r.pct}%"></i></div><small>${r.wd}/${r.wk}</small></div></td><td class="hide-m">${r.lf?`${subjChip(r.lf.subject)} <small class="muted">Understanding ${r.lf.scores.understanding}/5</small>`:'<small class="muted">None</small>'}</td><td class="hide-m">${r.ns?`<small>${whenTxt(r.ns)}</small>`:'<small class="muted">Not booked</small>'}</td><td>${r.flag?`<span class="badge redo">${icon('alert',12)} Needs attention</span>`:'<span class="badge ok">On track</span>'} ${r.wait?`<span class="badge wait">${r.wait} to review</span>`:''}</td></tr>`).join('')}</tbody></table>`:`<div class="empty">Add a learner to get started.</div>`}</div>
+  <div class="grid2" style="margin-top:22px"><section class="card"><h3>Awaiting review</h3>${waits.length?`<div class="tlist">${waits.map(t=>`<div class="trow"><span class="ico t-${SUB(t.subject).tone}">${SUB(t.subject).icon}</span><div class="tx"><b>${esc(t.title)}</b><small>${esc(student(t.sid).name)} · ${fmtD(t.date)}</small></div><button class="btn sm" data-a="openStudent" data-id="${t.sid}" data-tab="subs">Review</button></div>`).join('')}</div>`:`<div class="empty">Nothing to review.</div>`}</section>
+  <section class="card"><h3>Today’s video sessions</h3>${todayS.length?todayS.map(s=>sessRow(s,true,s.sid)).join(''):`<div class="empty">No sessions today.</div>`}</section></div>`;
+}
+
+/* ===== Admin: per learner ===== */
+function aStudent(){
+  const s=student(U.asid);if(!s)return `<div class="empty">Add a learner first. <button class="btn sm" data-a="addStudent">Add learner</button></div>`;
+  const x=LS(s.id),r=stats(s.id),wait=x.tasks.filter(t=>t.status==='submitted').length;
+  const tabs=[['plan','Learning plan'],['feedback','Feedback & adjust'],['subs','Submissions',wait],['mentor','Sessions & messages',x.messages.length&&x.messages[x.messages.length-1].from==='student'?1:0],['profile','Profile']];
+  const body=U.atab==='feedback'?aFeedback(s):U.atab==='subs'?aSubs(s):U.atab==='mentor'?aMentor(s):U.atab==='profile'?aProfile(s):aPlan(s);
+  return `<div class="spick">${C.students.map(t=>`<button class="${t.id===s.id?'on':''}" data-a="openStudent" data-id="${t.id}">${avatar(t)}${esc(t.name)}</button>`).join('')}<button class="btn sm ghost" data-a="addStudent">${icon('plus',15)} Add</button></div>
+  <div class="subrow">${avatar(s,44)}<div><div class="v" style="font-size:18px;font-family:var(--head)">${esc(s.name)}</div><div class="k">${esc(s.grade)} · Goal: ${esc(s.goal||'-')}</div></div>
+    <div><div class="k">This week</div><div class="v">${r.pct}% (${r.wd}/${r.wk})</div></div><div><div class="k">Overdue</div><div class="v" style="color:${r.late?'var(--orange)':'inherit'}">${r.late}</div></div>
+    <div><div class="k">Next session</div><div class="v">${r.ns?whenTxt(r.ns):'Not booked'}</div></div>
+    <div style="margin-left:auto;display:flex;gap:8px;flex-wrap:wrap">${s.meet?`<a class="btn meet sm" href="${esc(s.meet)}" target="_blank" rel="noopener noreferrer">${icon('video',15)} Open video room</a>`:`<button class="btn sm" data-a="atab" data-v="profile">${icon('video',15)} Add video room link</button>`}<button class="btn sm" data-a="previewStudent" data-id="${s.id}">View as learner ${icon('arrow',14)}</button></div></div>
+  ${s.note?`<div class="notice" style="margin:-8px 0 18px">${icon('info')}<span><b>Mentor note</b> · ${esc(s.note)}</span></div>`:''}
+  <div class="tabs">${tabs.map(([v,l,c])=>`<button class="${U.atab===v?'on':''}" data-a="atab" data-v="${v}">${l}${c?`<span class="cnt">${c}</span>`:''}</button>`).join('')}</div>${body}`;
+}
+function aPlan(s){const x=LS(s.id);const lateN=x.tasks.filter(t=>t.date<TODAY()&&(t.status==='todo'||t.status==='redo')).length;
+  return `<div class="head-row"><p class="lead">Add tasks with <b>+</b> on any day and they appear straight away in the learner’s “My plan” and home screen. Tap a card to edit, move or delete it.</p><div class="act"><button class="btn sm" data-a="copyWeek">${icon('copy',15)} Copy this week to next week</button><button class="btn sm pri" data-a="addTask" data-v="">${icon('plus',15)} Add task</button></div></div>
+  ${weekGrid(s.id,true)}
+  <div class="sec-t"><h2>Scheduling tools</h2><span class="muted small">Adjust the plan directly, no feedback needed</span></div>
+  <div class="tools">
+    <form class="tool" data-form="shift"><h4>${icon('shift',16)} Move tasks forward or back</h4><p>Moves all unfinished tasks from the chosen date in one go.</p>
+      <div class="f"><input type="date" name="from" value="${TODAY()}" aria-label="From date"><select name="days" aria-label="Days to move"><option value="1">+1 day</option><option value="2">+2 days</option><option value="3">+3 days</option><option value="7">+1 week</option><option value="-1">−1 day</option></select></div>
+      <button class="btn sm pri" style="width:100%">Move unfinished tasks</button></form>
+    <form class="tool" data-form="load"><h4>${icon('sliders',16)} Adjust workload</h4><p>Scales the time on unfinished tasks over the next two weeks.</p>
+      <div class="f"><select name="subject" aria-label="Subject"><option value="all">All subjects</option>${SUBJECTS.map(t=>`<option value="${t.id}">${t.name}</option>`).join('')}</select><select name="pct" aria-label="Percentage"><option value="-30">−30%</option><option value="-20" selected>−20%</option><option value="-10">−10%</option><option value="10">+10%</option><option value="20">+20%</option><option value="30">+30%</option></select></div>
+      <button class="btn sm pri" style="width:100%">Apply workload change</button></form>
+    <form class="tool" data-form="catchup"><h4>${icon('flag',16)} Spread out overdue tasks</h4><p>Reschedules overdue tasks from tomorrow, a few per day.</p>
+      <div class="f"><select name="per" aria-label="Tasks per day"><option value="1">1 per day</option><option value="2" selected>2 per day</option><option value="3">3 per day</option></select></div>
+      <button class="btn sm pri" style="width:100%">Reschedule (${lateN})</button></form>
+  </div>
+  <div class="sec-t"><h2>Change log</h2><span class="muted small">Learners can see this too</span></div>
+  ${x.logs.length?`<div class="logs">${x.logs.slice(0,8).map(g=>`<div class="log">${icon(g.fbId?'flag':'shift',16)}<span>${esc(g.text)}</span><small>${fmtAt(g.at)}</small></div>`).join('')}</div>`:`<div class="empty">No changes yet.</div>`}`}
+
+function aFeedback(s){const x=LS(s.id);const fbs=x.feedback.slice().sort((a,b)=>b.date.localeCompare(a.date));
+  const pf=U.pendingFb&&x.feedback.find(f=>f.id===U.pendingFb);
+  const lastSub=(fbs[0]&&fbs[0].subject)||'math';
+  return `${pf?suggPanel(s,pf):''}
+  <div class="grid2"><form class="card" data-form="feedback"><h3>New feedback</h3>
+    <div class="row2"><div class="field"><label for="fb-s">Subject</label><select id="fb-s" name="subject">${SUBJECTS.map(t=>`<option value="${t.id}" ${t.id===lastSub?'selected':''}>${t.icon} ${t.name}</option>`).join('')}</select></div><div class="field"><label for="fb-d">Date</label><input id="fb-d" type="date" name="date" value="${TODAY()}"></div></div>
+    ${[['understanding','Understanding'],['completion','Homework completion'],['effort','Effort & attitude']].map(([k,l])=>`<div class="field"><span class="lab">${l}</span><div class="rate">${[1,2,3,4,5].map(n=>`<label><input type="radio" name="${k}" value="${n}" ${n===3?'checked':''}><span>${n}</span></label>`).join('')}</div></div>`).join('')}
+    <div class="field"><label for="fb-f">Focus area</label><input id="fb-f" type="text" name="focus" placeholder="e.g. sign errors, direction in displacement"></div>
+    <div class="field"><label for="fb-c">Message to the learner</label><textarea id="fb-c" name="comment" placeholder="What went well, and the next step"></textarea></div>
+    <label class="check"><input type="checkbox" name="share" value="1" checked> Show to the learner</label>
+    <div class="mf" style="display:flex;justify-content:flex-end;margin-top:14px"><button class="btn pri">${icon('spark',16)} Save and see suggestions</button></div>
+    <p class="small muted" style="margin:10px 0 0">Based on the scores, NALA suggests review tasks, extra practice, workload changes and extra sessions. Choose the ones you want and they’re added to the plan.</p>
+  </form>
+  <section class="card"><h3>Feedback history</h3>${fbs.length?fbs.map(f=>`<div class="fbcard"><div class="h">${subjChip(f.subject)}${f.share?'':'<span class="badge">Private</span>'}<small>${fmtD(f.date)}</small></div>${fbBody(f,false)}<div style="display:flex;gap:6px;margin-top:10px"><button class="btn xs" data-a="reSugg" data-id="${f.id}">${icon('spark',13)} Show suggestions again</button><button class="btn xs danger" data-a="delFb" data-id="${f.id}">Delete</button></div></div>`).join(''):`<div class="empty">No feedback written yet.</div>`}</section></div>`}
+function suggPanel(s,f){const sg=suggest(s.id,f);
+  return `<form class="sugg" data-form="applySugg" data-fb="${f.id}"><h3>${icon('spark',18)} Suggested adjustments · ${esc(s.name)}</h3><p class="small muted" style="margin:4px 0 6px">${SUB(f.subject).name} · Understanding ${f.scores.understanding} / Completion ${f.scores.completion} / Effort ${f.scores.effort}${f.focus?' · '+esc(f.focus):''}</p>
+  ${sg.map(o=>`<label class="sopt"><input type="checkbox" name="opt" value="${o.key}" ${o.on!==false?'checked':''}><span><b>${esc(o.label)}</b><small>${esc(o.detail||'')}</small></span></label>`).join('')}
+  <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px;flex-wrap:wrap"><button type="button" class="btn sm" data-a="dismissSugg">Later</button><button class="btn sm pri">${icon('check',15)} Apply selected</button></div></form>`}
+
+/* Feedback → curriculum and schedule suggestions */
+function suggest(sid,f){
+  const out=[],t0=TODAY(),d1=addDays(t0,1),d2=addDays(t0,2),sc=f.scores,x=LS(sid);
+  const ls=C.lessons.filter(l=>l.subject===f.subject);
+  const recent=x.tasks.filter(t=>t.subject===f.subject&&t.lessonId&&t.date<=t0).sort((a,b)=>b.date.localeCompare(a.date))[0];
+  const lz=(recent&&lesson(recent.lessonId))||ls[0];
+  const we=addDays(weekStart(t0),6);
+  if(sc.understanding<=2&&lz){
+    out.push({key:'review',label:`Add a review video · ${lz.title}`,detail:`${relD(d1)} · ${lz.minutes} min · rewatch and retry the quiz`,apply:()=>[mk(sid,{date:d1,subject:f.subject,type:'lesson',lessonId:lz.id,title:'[Review] '+lz.title,detail:'From feedback: '+(f.focus||'revisit the concept'),minutes:lz.minutes},f)]});
+    out.push({key:'practice',label:`Add extra practice · ${f.focus||lz.title}`,detail:`${relD(d2)} · 20 min · 3 similar problems`,apply:()=>[mk(sid,{date:d2,subject:f.subject,type:'homework',lessonId:lz.id,title:'3 extra problems: '+(f.focus||lz.title),detail:'Solve three problems focused on '+(f.focus||lz.title)+' and show your working.',minutes:20},f)]});
+    const has=x.sessions.some(s=>s.status!=='done'&&s.date>=t0&&s.date<=addDays(t0,7));
+    if(!has)out.push({key:'session',label:'Book a 30-minute 1:1 video session',detail:`${relD(d2)} 19:00 · ${f.focus||SUB(f.subject).name+' check-in'}`,apply:()=>{x.sessions.push({id:uid('m'),date:d2,time:'19:00',minutes:30,topic:(f.focus||SUB(f.subject).name)+' check-in',meet:'',status:'scheduled',notes:''});return []}});
+  }
+  if(sc.completion<=2){
+    const rest=x.tasks.filter(t=>t.date>=t0&&t.date<=we&&!isDone(t));
+    if(rest.length)out.push({key:'lighten',label:'Reduce this week’s remaining workload by 20%',detail:`Shortens the time on ${plural(rest.length,'remaining task')}`,apply:()=>{rest.forEach(t=>t.minutes=Math.max(5,Math.round(t.minutes*.8/5)*5));return rest}});
+    const late=x.tasks.filter(t=>t.date<t0&&(t.status==='todo'||t.status==='redo'));
+    if(late.length)out.push({key:'catchup',label:`Reschedule ${plural(late.length,'overdue task')}`,detail:'Two per day, starting tomorrow',apply:()=>catchup(sid,2)});
+  }
+  if(sc.effort<=2)out.push({key:'checkin',label:'Add a 10-minute daily check-in for 3 days',detail:`From ${relD(d1)} · three-line summary of what you learnt`,apply:()=>[0,1,2].map(i=>mk(sid,{date:addDays(t0,i+1),subject:f.subject,type:'review',title:'10-minute check-in',detail:'Write three lines on what you studied today and one thing you found difficult.',minutes:10},f))});
+  if(sc.understanding>=4&&sc.completion>=4&&lz)out.push({key:'advance',label:`Add an extension task · ${lz.title}`,detail:`${relD(d2)} · 30 min · harder application problems`,apply:()=>[mk(sid,{date:d2,subject:f.subject,type:'homework',lessonId:lz.id,title:'[Extension] '+lz.title,detail:'Solve two problems that apply this concept in a new situation, and explain your strategy.',minutes:30},f)]});
+  if(sc.understanding>=4){const rv=x.tasks.filter(t=>t.subject===f.subject&&t.type==='review'&&t.date>=t0&&!isDone(t));if(rv.length)out.push({key:'skipReview',label:`Shorten ${plural(rv.length,'upcoming '+SUB(f.subject).name+' review')}`,detail:'Understanding is already strong, so cut review time to 10 minutes',on:false,apply:()=>{rv.forEach(t=>t.minutes=10);return rv}})}
+  if(!out.length)out.push({key:'keep',label:'Keep the current plan',detail:'Share the feedback without changing the plan',apply:()=>[]});
+  return out;
+}
+function mk(sid,o,f){const t={id:uid('t'),status:'todo',answer:'',review:'',origin:f?'feedback':'plan',fbId:f?f.id:'',lessonId:'',detail:'',minutes:20,...o};LS(sid).tasks.push(t);return t}
+function catchup(sid,per){const x=LS(sid),t0=TODAY();const late=x.tasks.filter(t=>t.date<t0&&(t.status==='todo'||t.status==='redo')).sort((a,b)=>a.date.localeCompare(b.date));late.forEach((t,i)=>{t.date=addDays(t0,1+Math.floor(i/per));t.origin=t.origin==='feedback'?'feedback':'adjust'});return late}
+
+function aSubs(s){const x=LS(s.id);const ord={submitted:0,redo:1,done:2};const subs=x.tasks.filter(t=>t.type==='homework'&&(t.status!=='todo'||t.answer)).sort((a,b)=>(ord[a.status]??3)-(ord[b.status]??3)||b.date.localeCompare(a.date));
+  return subs.length?subs.map(t=>`<div class="subcard"><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">${subjChip(t.subject)}<b>${esc(t.title)}</b><span class="badge ${t.status==='submitted'?'wait':t.status==='done'?'ok':t.status==='redo'?'redo':''}">${STATUS[t.status]}</span><small class="muted" style="margin-left:auto">${fmtD(t.date)}</small></div>
+  <p class="small muted" style="margin:8px 0 0">${esc(t.detail)}</p><div class="answer">${esc(t.answer||'(no answer)')}</div>
+  ${t.status==='submitted'?`<form data-form="review" data-id="${t.id}"><div class="field"><label for="rv-${t.id}">Mentor comment</label><textarea id="rv-${t.id}" name="review" placeholder="What went well and what to fix" required></textarea></div><div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap"><button class="btn sm" name="decision" value="redo">Ask to resubmit</button><button class="btn sm pri" name="decision" value="done">${icon('check',14)} Approve</button></div></form>`:t.review?`<div class="adj" style="background:var(--bg)"><b style="color:var(--green)">Mentor comment</b><p style="margin:4px 0 0">${esc(t.review)}</p></div>`:''}</div>`).join(''):`<div class="empty">No homework submitted yet.</div>`}
+function aMentor(s){const x=LS(s.id);const ss=x.sessions.slice().sort((a,b)=>(b.status==='done')-(a.status==='done')||(a.date+a.time).localeCompare(b.date+b.time));
+  return `<div class="grid2"><section class="card"><div class="sec-t" style="margin-top:0"><h2>Video sessions</h2><button class="btn sm pri more" data-a="addSession" data-sid="${s.id}">${icon('plus',15)} Add session</button></div>${ss.length?ss.map(t=>sessRow(t,true,s.id)).join(''):`<div class="empty">No sessions booked.</div>`}</section>
+  <section class="card"><h3>Questions & replies</h3>${thread(s.id,'mentor')}</section></div>`}
+function aProfile(s){return `<form class="card" data-form="profile" style="max-width:640px"><h3>Learner details</h3>
+  <div class="row2"><div class="field"><label for="p-n">Name</label><input id="p-n" type="text" name="name" value="${esc(s.name)}" required></div><div class="field"><label for="p-g">Grade</label><input id="p-g" type="text" name="grade" value="${esc(s.grade)}"></div></div>
+  <div class="field"><label for="p-goal">Learning goal</label><input id="p-goal" type="text" name="goal" value="${esc(s.goal||'')}"></div>
+  <div class="field"><label for="p-note">Mentor note (not shown to the learner)</label><textarea id="p-note" name="note">${esc(s.note||'')}</textarea></div>
+  <div class="field"><label for="p-meet">Regular video room (Google Meet link)</label><input id="p-meet" type="url" name="meet" value="${esc(s.meet||'')}" placeholder="https://meet.google.com/abc-defg-hij"><span class="hint">The learner’s “Call my mentor” button opens this link. A link set on an individual session takes priority. <a href="${MEET_NEW}" target="_blank" rel="noopener noreferrer">Create a new meeting ↗</a>, then paste its link here.</span></div>
+  <div class="field"><span class="lab">Avatar colour</span><div class="rate">${TONES.map(t=>`<label><input type="radio" name="tone" value="${t}" ${s.tone===t?'checked':''}><span class="t-${t}" style="border-color:transparent">●</span></label>`).join('')}</div></div>
+  <div class="mf" style="display:flex;gap:8px;margin-top:8px"><button type="button" class="btn sm danger" data-a="delStudent" data-id="${s.id}">${icon('trash',14)} Delete learner</button><button class="btn pri" style="margin-left:auto">Save</button></div></form>`}
+
+/* ===== Admin: Sessions ===== */
+function aSessions(){const all=C.students.flatMap(s=>LS(s.id).sessions.map(x=>({...x,sid:s.id})));
+  const up=all.filter(s=>s.status!=='done').sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time)),past=all.filter(s=>s.status==='done').sort((a,b)=>b.date.localeCompare(a.date));
+  const groups={};up.forEach(s=>(groups[s.date]=groups[s.date]||[]).push(s));
+  const nolink=C.students.filter(s=>!s.meet);
+  return `<div class="head-row"><div><div class="eyebrow">Online mentoring</div><h1 class="ptitle">Mentoring <em>sessions</em></h1><p class="lead">Book a session and add a Google Meet link. The learner’s video call button updates straight away.</p></div><div class="act"><a class="btn" href="${MEET_NEW}" target="_blank" rel="noopener noreferrer">${icon('ext',15)} New Meet</a><button class="btn pri" data-a="addSession">${icon('plus',16)} Add session</button></div></div>
+  ${nolink.length?`<div class="notice" style="margin-bottom:18px">${icon('info')}<span>No regular video room yet for: <b>${nolink.map(s=>esc(s.name)).join(', ')}</b> · Add one under Learners → Profile, or add a link to each session.</span></div>`:''}
+  <div class="grid2"><section>${Object.keys(groups).length?Object.entries(groups).map(([d,ss])=>`<div class="sec-t" style="margin-top:6px"><h2 style="font-size:16px">${relD(d)} <span class="muted small">${fmtD(d)}</span></h2></div>${ss.map(s=>sessRow(s,true,s.sid)).join('')}`).join(''):`<div class="empty">No upcoming sessions.</div>`}</section>
+  <section class="card"><h3>Past sessions</h3>${past.length?past.map(s=>`<div class="fbcard"><div class="h"><b>${esc(student(s.sid).name)} · ${esc(s.topic)}</b><small>${fmtD(s.date)}</small></div>${s.notes?`<p class="small">${esc(s.notes)}</p>`:'<p class="small muted">No notes</p>'}</div>`).join(''):`<div class="empty">No past sessions yet.</div>`}</section></div>`}
+
+/* ===== Admin: Lesson library ===== */
+function aLibrary(){const ls=C.lessons.filter(l=>U.lib==='all'||l.subject===U.lib);
+  return `<div class="head-row"><div><div class="eyebrow">Video lesson content</div><h1 class="ptitle">Lesson <em>library</em></h1><p class="lead">Add a video link and the key steps, then assign the lesson in any learner’s plan.</p></div><div class="act"><button class="btn pri" data-a="editLesson" data-id="">${icon('plus',16)} Add lesson</button></div></div>
+  <div class="filters">${[['all','All'],...SUBJECTS.map(s=>[s.id,s.icon+' '+s.name])].map(([v,l])=>`<button class="${U.lib===v?'on':''}" data-a="lib" data-v="${v}">${l}</button>`).join('')}</div>
+  <div class="card" style="padding:6px 8px;overflow-x:auto"><table class="tbl"><thead><tr><th>Lesson</th><th>Subject</th><th class="hide-m">Length</th><th class="hide-m">Video</th><th class="hide-m">Quiz</th><th></th></tr></thead><tbody>${ls.map(l=>`<tr><td><b>${esc(l.title)}</b><br><small class="muted">${esc(l.summary||'')}</small></td><td>${subjChip(l.subject)}</td><td class="hide-m">${l.minutes} min</td><td class="hide-m">${l.video?`<a href="${esc(l.video)}" target="_blank" rel="noopener noreferrer" class="badge live">Link ${icon('ext',11)}</a>`:'<span class="badge">None</span>'}</td><td class="hide-m">${plural((l.quiz||[]).length,'question')}</td><td style="text-align:right;white-space:nowrap"><button class="icon-btn" data-a="editLesson" data-id="${l.id}" aria-label="Edit">${icon('edit',15)}</button></td></tr>`).join('')}</tbody></table></div>`}
+
+/* ===== Admin: Settings ===== */
+function aSettings(){return `<div class="eyebrow">Setup</div><h1 class="ptitle">Settings</h1><p class="lead">Manage mentor details and data sync.</p>
+  <div class="grid2"><form class="card" data-form="mentor"><h3>Mentor details</h3><div class="field"><label for="m-n">Display name</label><input id="m-n" type="text" name="name" value="${esc(C.mentor.name)}"></div><button class="btn pri">Save</button></form>
+  <section class="card"><h3>Data sync</h3>${syncBox()}<p class="small muted">${shared()?'Everyone who opens this site sees the same data. Learners open the Learner space and choose their own name.':'Right now data is saved in this browser only. The learner space and admin tab stay in sync within this browser.'}</p>
+  <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn sm" data-a="copyJSON">${icon('copy',15)} Copy data as JSON</button><button class="btn sm danger" data-a="resetDemo">Reset to demo data</button></div></section></div>
+  <div class="notice" style="margin-top:20px">${icon('info')}<span>This is a prototype, so switching roles needs no login. Before a real pilot you’d need secure learner and mentor accounts, safeguarding procedures, parental consent and controlled mentor access.</span></div>`}
+
+/* ===== Modals ===== */
+function modal(){const m=U.modal;let h='';
+  if(m.type==='task'){const s=student(U.asid),t=m.id?LS(U.asid).tasks.find(x=>x.id===m.id):null,v=t||{date:m.date||TODAY(),subject:'math',type:'lesson',minutes:15,lessonId:'',title:'',detail:''};
+    h=`<form data-form="task"><div class="mh"><h3>${t?'Edit task':'Add task'} · ${esc(s.name)}</h3><button type="button" class="icon-btn" data-a="close" aria-label="Close">${icon('x',16)}</button></div>
+    <div class="row3"><div class="field"><label for="t-d">Date</label><input id="t-d" type="date" name="date" value="${v.date}" required></div><div class="field"><label for="t-ty">Type</label><select id="t-ty" name="type">${Object.entries(TYPES).map(([k,l])=>`<option value="${k}" ${v.type===k?'selected':''}>${l}</option>`).join('')}</select></div><div class="field"><label for="t-m">Time (min)</label><input id="t-m" type="number" min="5" step="5" name="minutes" value="${v.minutes}"></div></div>
+    <div class="row2"><div class="field"><label for="t-s">Subject</label><select id="t-s" name="subject">${SUBJECTS.map(x=>`<option value="${x.id}" ${v.subject===x.id?'selected':''}>${x.icon} ${x.name}</option>`).join('')}</select></div><div class="field"><label for="t-l">Linked lesson</label><select id="t-l" name="lessonId"><option value="">None</option>${C.lessons.map(l=>`<option value="${l.id}" ${v.lessonId===l.id?'selected':''}>${SUB(l.subject).name} · ${esc(l.title)}</option>`).join('')}</select></div></div>
+    <div class="field"><label for="t-t">Title</label><input id="t-t" type="text" name="title" value="${esc(v.title)}" placeholder="Leave blank to use the linked lesson’s title"></div>
+    <div class="field"><label for="t-de">Instructions (shown to the learner)</label><textarea id="t-de" name="detail" placeholder="Leave blank to use the linked lesson’s homework or summary">${esc(v.detail)}</textarea></div>
+    ${t?`<div class="field"><label for="t-st">Status</label><select id="t-st" name="status">${Object.entries(STATUS).map(([k,l])=>`<option value="${k}" ${t.status===k?'selected':''}>${l}</option>`).join('')}</select></div>`:`<div class="field"><label for="t-r">Repeat</label><select id="t-r" name="repeat"><option value="0">Don’t repeat</option><option value="4">Same day every week · 4 weeks</option><option value="8">Same day every week · 8 weeks</option></select><span class="hint">Set up a routine like “Maths homework every Monday” in one go.</span></div>`}
+    <div class="mf">${t?`<button type="button" class="btn danger l" data-a="delTask" data-id="${t.id}">${icon('trash',14)} Delete</button>`:''}<button type="button" class="btn" data-a="close">Cancel</button><button class="btn pri">${t?'Save':'Add'}</button></div></form>`}
+  if(m.type==='taskView'){const t=LS(U.sid).tasks.find(x=>x.id===m.id);if(!t){U.modal=null;return ''}const l=t.lessonId&&lesson(t.lessonId);
+    h=`<div class="mh">${subjChip(t.subject)}<span class="badge">${TYPES[t.type]}</span><button type="button" class="icon-btn" data-a="close" aria-label="Close">${icon('x',16)}</button></div><h3 style="font-size:22px;margin-bottom:6px">${esc(t.title)}</h3><p class="muted small" style="margin:0 0 12px">${fmtD(t.date)} · ${t.minutes} min · ${STATUS[t.status]} ${t.origin==='feedback'?'· <span class="badge fb">From feedback</span>':''}</p>
+    ${t.detail?`<div class="answer" style="white-space:normal">${esc(t.detail)}</div>`:''}
+    ${t.review?`<div class="adj" style="background:var(--bg)"><b style="color:var(--green)">Mentor comment</b><p style="margin:4px 0 0">${esc(t.review)}</p></div>`:''}
+    ${t.type==='homework'?(t.status==='todo'||t.status==='redo'?`<form data-form="submit" data-id="${t.id}" style="margin-top:14px"><div class="field"><label for="ans">Your answer</label><textarea id="ans" name="answer" rows="6" required placeholder="Show your working step by step">${esc(t.answer)}</textarea></div><div class="mf">${l?`<button type="button" class="btn l" data-a="openLesson" data-id="${l.id}">${icon('play',14)} Rewatch lesson</button>`:''}<button class="btn pri">${icon('send',15)} Submit to mentor</button></div></form>`:`<div class="field" style="margin-top:14px"><span class="lab">Your submitted answer</span><div class="answer">${esc(t.answer)}</div></div>`)
+     :`<div class="mf">${l?`<button class="btn ${isDone(t)?'':'pri'} l" data-a="openLesson" data-id="${l.id}">${icon('play',14)} Open lesson</button>`:''}<button class="btn ${l?'':'pri'}" data-a="toggleTask" data-id="${t.id}">${isDone(t)?'Mark as not done':icon('check',15)+' Mark as done'}</button></div>`}`}
+  if(m.type==='session'){const sid=m.sid||U.asid||C.students[0].id;const x=m.id?LS(sid).sessions.find(s=>s.id===m.id):null;const v=x||{date:addDays(TODAY(),1),time:'19:00',minutes:30,topic:'',meet:''};
+    h=`<form data-form="session"><div class="mh"><h3>${x?'Edit session':'Book a video session'}</h3><button type="button" class="icon-btn" data-a="close" aria-label="Close">${icon('x',16)}</button></div>
+    <div class="field"><label for="s-s">Learner</label><select id="s-s" name="sid" ${x?'disabled':''}>${C.students.map(s=>`<option value="${s.id}" ${s.id===sid?'selected':''}>${esc(s.name)}</option>`).join('')}</select></div>
+    <div class="row3"><div class="field"><label for="s-d">Date</label><input id="s-d" type="date" name="date" value="${v.date}" required></div><div class="field"><label for="s-t">Time</label><input id="s-t" type="time" name="time" value="${v.time}" required></div><div class="field"><label for="s-m">Length (min)</label><input id="s-m" type="number" min="10" step="5" name="minutes" value="${v.minutes}"></div></div>
+    <div class="field"><label for="s-to">Topic</label><input id="s-to" type="text" name="topic" value="${esc(v.topic)}" placeholder="e.g. Factorisation corrections" required></div>
+    <div class="field"><label for="s-l">Google Meet link</label><input id="s-l" type="url" name="meet" value="${esc(v.meet)}" placeholder="Leave blank to use the learner’s regular video room"><span class="hint"><a href="${MEET_NEW}" target="_blank" rel="noopener noreferrer">Create a new meeting ↗</a>, then copy its link and paste it here.</span></div>
+    <label class="check"><input type="checkbox" name="setDefault" value="1"> Also save as the learner’s regular video room</label>
+    <div class="mf">${x?`<button type="button" class="btn danger l" data-a="delSession" data-sid="${sid}" data-id="${x.id}">${icon('trash',14)} Delete</button>`:''}<button type="button" class="btn" data-a="close">Cancel</button><button class="btn pri">${x?'Save':'Book session'}</button></div></form>`}
+  if(m.type==='sessDone'){const x=LS(m.sid).sessions.find(s=>s.id===m.id);
+    h=`<form data-form="sessDone"><div class="mh"><h3>Session complete · ${esc(student(m.sid).name)}</h3><button type="button" class="icon-btn" data-a="close" aria-label="Close">${icon('x',16)}</button></div><p class="muted small" style="margin-top:-8px">${esc(x.topic)} · ${fmtD(x.date)} ${x.time}</p>
+    <div class="field"><label for="sd-n">Session notes (shown to the learner)</label><textarea id="sd-n" name="notes" placeholder="What you covered and what to do before next time">${esc(x.notes)}</textarea></div>
+    <label class="check"><input type="checkbox" name="toFb" value="1" checked> Then go to feedback (and adjust the plan)</label>
+    <div class="mf"><button type="button" class="btn" data-a="close">Cancel</button><button class="btn pri">Mark as done</button></div></form>`}
+  if(m.type==='lesson'){const l=m.id?lesson(m.id):null,v=l||{subject:'math',title:'',minutes:12,video:'',summary:'',steps:[],homework:''};
+    h=`<form data-form="lesson"><div class="mh"><h3>${l?'Edit lesson':'Add lesson'}</h3><button type="button" class="icon-btn" data-a="close" aria-label="Close">${icon('x',16)}</button></div>
+    <div class="row2"><div class="field"><label for="l-s">Subject</label><select id="l-s" name="subject">${SUBJECTS.map(x=>`<option value="${x.id}" ${v.subject===x.id?'selected':''}>${x.icon} ${x.name}</option>`).join('')}</select></div><div class="field"><label for="l-m">Length (min)</label><input id="l-m" type="number" min="1" name="minutes" value="${v.minutes}"></div></div>
+    <div class="field"><label for="l-t">Title</label><input id="l-t" type="text" name="title" value="${esc(v.title)}" required></div>
+    <div class="field"><label for="l-v">Video link (YouTube etc.)</label><input id="l-v" type="url" name="video" value="${esc(v.video)}" placeholder="https://youtu.be/..."><span class="hint">Learners see an “Open original video” button. If you host this page elsewhere, YouTube videos play right inside the lesson.</span></div>
+    <div class="field"><label for="l-su">One-line summary</label><input id="l-su" type="text" name="summary" value="${esc(v.summary)}"></div>
+    <div class="field"><label for="l-st">Key steps (one per line: title | formula or key phrase | explanation)</label><textarea id="l-st" name="steps" rows="4">${esc((v.steps||[]).map(s=>[s.t,s.f,s.b].join(' | ')).join('\n'))}</textarea></div>
+    <div class="field"><label for="l-h">Linked homework</label><textarea id="l-h" name="homework" rows="2">${esc(v.homework||'')}</textarea></div>
+    <div class="mf">${l?`<button type="button" class="btn danger l" data-a="delLesson" data-id="${l.id}">${icon('trash',14)} Delete</button>`:''}<button type="button" class="btn" data-a="close">Cancel</button><button class="btn pri">Save</button></div></form>`}
+  if(m.type==='student'){h=`<form data-form="newStudent"><div class="mh"><h3>Add learner</h3><button type="button" class="icon-btn" data-a="close" aria-label="Close">${icon('x',16)}</button></div>
+    <div class="row2"><div class="field"><label for="n-n">Name</label><input id="n-n" type="text" name="name" required></div><div class="field"><label for="n-g">Grade</label><input id="n-g" type="text" name="grade" value="Grade 10"></div></div>
+    <div class="field"><label for="n-goal">Learning goal</label><input id="n-goal" type="text" name="goal"></div>
+    <div class="field"><label for="n-meet">Regular video room (optional)</label><input id="n-meet" type="url" name="meet" placeholder="https://meet.google.com/..."></div>
+    <div class="mf"><button type="button" class="btn" data-a="close">Cancel</button><button class="btn pri">Add</button></div></form>`}
+  if(m.type==='confirm'){h=`<div class="mh"><h3>${esc(m.title)}</h3></div><p class="muted">${esc(m.body)}</p><div class="mf"><button class="btn" data-a="close">Cancel</button><button class="btn pri" style="background:var(--red);border-color:var(--red)" data-a="confirmOk">${esc(m.ok||'Confirm')}</button></div>`}
+  return `<div class="scrim" data-a="scrim"><div class="modal" role="dialog" aria-modal="true">${h}</div></div>`;
+}
+
+/* ===== Events ===== */
+let toastT=null;
+function toast(t){U.toast=t;clearTimeout(toastT);const old=app.querySelector('.toast');if(old)old.remove();app.querySelector('.app')?.insertAdjacentHTML('beforeend',`<div class="toast" role="status">${esc(t)}</div>`);toastT=setTimeout(()=>{U.toast=null;app.querySelector('.toast')?.remove()},2600)}
+function confirmDo(title,body,ok,fn){U.modal={type:'confirm',title,body,ok,fn};render()}
+document.addEventListener('change',e=>{const el=e.target.closest('[data-change]');if(!el)return;if(el.dataset.change==='sid'){U.sid=el.value;U.week=0;if(U.view==='lesson'){U.view='lessons';U.player=null}render()}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&U.modal){U.modal=null;render()}});
+document.addEventListener('click',e=>{
+  const b=e.target.closest('[data-a]');if(!b)return;const a=b.dataset.a,d=b.dataset;
+  if(a==='scrim'){if(e.target===b){U.modal=null;render()}return}
+  switch(a){
+    case 'seed':{if(d.v==='demo'){const x=buildDemo(TODAY());C=x.config;L=x.learners}else{C={v:2,mentor:{name:'Mentor'},students:[],lessons:LESSONS};L={}}ensureUI();if(d.v!=='demo')U.role='admin';commit('Your learning space is ready');break}
+    case 'role':U.role=d.v;U.modal=null;U.player=null;if(d.v==='student'&&U.view==='lesson')U.view='lessons';window.scrollTo(0,0);render();break;
+    case 'nav':if(U.role==='student'){U.view=d.v;U.player=null}else{U.aview=d.v;U.pendingFb=null}U.week=0;U.modal=null;window.scrollTo(0,0);render();break;
+    case 'close':U.modal=null;render();break;
+    case 'nolink':toast('Your mentor hasn’t added a video link yet. Leave a message on the Mentoring tab');break;
+    case 'week':U.week=d.v==='0'?0:U.week+Number(d.v);render();break;
+    case 'lib':U.lib=d.v;render();break;
+    case 'tview':U.tview=d.v;render();break;
+    case 'startToday':{const t=todayTasks(U.sid).find(t=>!isDone(t));if(!t)break;if(t.type==='lesson'&&t.lessonId)openLesson(t.lessonId);else{U.modal={type:'taskView',id:t.id};render()}break}
+    case 'openLesson':openLesson(d.id);break;
+    case 'openTask':U.modal={type:'taskView',id:d.id};render();break;
+    case 'toggleTask':{if(!canWrite())break;const t=LS(U.sid).tasks.find(x=>x.id===d.id);if(!t)break;t.status=isDone(t)?'todo':'done';if(U.modal)U.modal=null;commit(t.status==='done'?'Done – nice work ✳':'Marked as not done');break}
+    case 'play':{const P=U.player;if(P.finished){P.seg=0;P.t=0;P.finished=false}P.playing=!P.playing;render();break}
+    case 'seg':{const P=U.player;P.seg=Number(d.v);P.t=0;P.finished=false;render();break}
+    case 'ans':{U.quiz[d.q]=Number(d.o);const l=lesson(U.lessonId);if((l.quiz||[]).every((q,i)=>U.quiz[i]!=null))finishLesson(l);else render();break}
+    case 'retry':U.quiz={};render();break;
+    case 'finishLesson':finishLesson(lesson(U.lessonId));break;
+    // admin
+    case 'openStudent':U.aview='student';U.asid=d.id;U.atab=d.tab||U.atab||'plan';U.week=0;U.pendingFb=null;window.scrollTo(0,0);render();break;
+    case 'atab':U.atab=d.v;U.pendingFb=null;render();break;
+    case 'previewStudent':U.role='student';U.sid=d.id;U.view='home';window.scrollTo(0,0);render();break;
+    case 'addTask':U.modal={type:'task',date:d.v||addDays(weekStart(TODAY()),U.week*7+((new Date().getDay()+6)%7))};render();break;
+    case 'editTask':U.modal={type:'task',id:d.id};render();break;
+    case 'delTask':{if(!canWrite())break;const x=LS(U.asid);const t=x.tasks.find(z=>z.id===d.id);x.tasks=x.tasks.filter(z=>z.id!==d.id);U.modal=null;addLog(U.asid,`Removed task · ${t?t.title:''}`);commit('Task deleted');break}
+    case 'copyWeek':{if(!canWrite())break;const ws=addDays(weekStart(TODAY()),U.week*7),x=LS(U.asid);const src=x.tasks.filter(t=>t.date>=ws&&t.date<=addDays(ws,6));if(!src.length){toast('No tasks to copy');break}src.forEach(t=>x.tasks.push({...t,id:uid('t'),date:addDays(t.date,7),status:'todo',answer:'',review:'',origin:'plan',fbId:''}));addLog(U.asid,`Copied ${plural(src.length,'task')} from the week of ${shortD(ws)} to the next week`);U.week++;commit(`Copied ${plural(src.length,'task')} to next week`);break}
+    case 'dismissSugg':U.pendingFb=null;render();break;
+    case 'reSugg':U.pendingFb=d.id;window.scrollTo(0,0);render();break;
+    case 'delFb':confirmDo('Delete feedback','Delete this feedback? Tasks already added from it will stay in the plan.','Delete',()=>{const x=LS(U.asid);x.feedback=x.feedback.filter(f=>f.id!==d.id);if(U.pendingFb===d.id)U.pendingFb=null;commit('Deleted')});break;
+    case 'addSession':U.modal={type:'session',sid:d.sid||(U.aview==='student'?U.asid:null)};render();break;
+    case 'editSession':U.modal={type:'session',sid:d.sid,id:d.id};render();break;
+    case 'doneSession':U.modal={type:'sessDone',sid:d.sid,id:d.id};render();break;
+    case 'delSession':{if(!canWrite())break;const x=LS(d.sid);x.sessions=x.sessions.filter(s=>s.id!==d.id);U.modal=null;commit('Session deleted');break}
+    case 'editLesson':U.modal={type:'lesson',id:d.id};render();break;
+    case 'delLesson':confirmDo('Delete lesson','Remove this lesson from the library? Tasks already assigned will just lose the link.','Delete',()=>{C.lessons=C.lessons.filter(l=>l.id!==d.id);commit('Lesson deleted')});break;
+    case 'addStudent':U.modal={type:'student'};render();break;
+    case 'delStudent':confirmDo('Delete learner',`Delete ${student(d.id).name} and all their plans, feedback and sessions? This can’t be undone.`,'Delete',()=>{C.students=C.students.filter(s=>s.id!==d.id);delete L[d.id];removeDoc('learners/'+d.id);U.asid=null;U.aview='overview';commit('Learner deleted')});break;
+    case 'confirmOk':{const fn=U.modal&&U.modal.fn;U.modal=null;if(fn&&canWrite())fn();else render();break}
+    case 'resetDemo':confirmDo('Reset to demo data','This deletes every learner, plan and piece of feedback and replaces them with demo data. It can’t be undone.','Reset',()=>{const old=Object.keys(L);const x=buildDemo(TODAY());C=x.config;L=x.learners;old.filter(k=>!L[k]).forEach(k=>removeDoc('learners/'+k));ensureUI();commit('Reset to demo data')});break;
+    case 'copyJSON':{try{navigator.clipboard.writeText(JSON.stringify({config:C,learners:L},null,2)).then(()=>toast('JSON copied'),()=>toast('Copying was blocked'))}catch(err){toast('Copying was blocked')}break}
+  }
+});
+function openLesson(id){U.role='student';U.view='lesson';U.lessonId=id;U.player={seg:0,t:0,playing:false,finished:false};U.quiz={};U.modal=null;U.tview=EMBED_OK&&ytId((lesson(id)||{}).video)?'video':'steps';window.scrollTo(0,0);render()}
+function finishLesson(l){if(!l)return;const qs=l.quiz||[],score=qs.filter((q,i)=>U.quiz[i]===q.a).length;const x=LS(U.sid);
+  if(!readOnly){x.progress[l.id]={done:true,score,total:qs.length,at:nowAt()};const ws=weekStart(TODAY());const t=x.tasks.filter(t=>t.lessonId===l.id&&t.type==='lesson'&&!isDone(t)&&t.date<=addDays(ws,6)).sort((a,b)=>a.date.localeCompare(b.date))[0];if(t)t.status='done';persist();render();toast(t?'Lesson complete – ticked off in your plan':'Lesson complete')}else render()}
+
+document.addEventListener('submit',e=>{
+  const f=e.target.closest('form[data-form]');if(!f)return;e.preventDefault();if(!canWrite())return;
+  const fd=new FormData(f),g=k=>(fd.get(k)||'').toString().trim(),kind=f.dataset.form;
+  switch(kind){
+    case 'msg':{const t=g('text');if(!t)return;LS(f.dataset.sid).messages.push({id:uid('c'),from:f.dataset.from,text:t,at:nowAt()});const x=LS(f.dataset.sid);if(x.messages.length>200)x.messages=x.messages.slice(-200);commit();setTimeout(()=>{const i=app.querySelector('form[data-form=msg] input');if(i)i.focus()},0);break}
+    case 'task':{const x=LS(U.asid),m=U.modal,l=lesson(g('lessonId'));const ty=g('type');const o={date:g('date'),type:ty,subject:g('subject'),lessonId:g('lessonId'),minutes:Math.max(5,Number(g('minutes'))||15),title:g('title')||(l?(ty==='homework'?l.title+' – homework':ty==='review'?l.title+' – review':l.title):TYPES[ty]),detail:g('detail')||(l?(ty==='homework'?l.homework:l.summary):'')};
+      if(l&&o.subject!==l.subject)o.subject=l.subject;
+      if(m.id){const t=x.tasks.find(z=>z.id===m.id);const moved=t.date!==o.date;Object.assign(t,o,{status:g('status')||t.status});if(moved){t.origin=t.origin==='feedback'?'feedback':'adjust';addLog(U.asid,`Moved · ${t.title} → ${fmtD(t.date)}`)}else addLog(U.asid,`Edited task · ${t.title}`);U.modal=null;commit('Saved · learner view updated')}
+      else{const rep=Number(g('repeat'))||1;for(let i=0;i<rep;i++)mk(U.asid,{...o,date:addDays(o.date,i*7),origin:'plan'});addLog(U.asid,`Added task · ${DOWL[(parse(o.date).getDay()+6)%7]}: ${o.title}${rep>1?` (weekly for ${rep} weeks)`:''}`);U.modal=null;commit(rep>1?`Added ${rep} weeks of tasks`:'Task added · learner view updated')}
+      break}
+    case 'shift':{const from=g('from')||TODAY(),n=Number(g('days'));const ts=LS(U.asid).tasks.filter(t=>t.date>=from&&(t.status==='todo'||t.status==='redo'));if(!ts.length){toast('No tasks to move');return}ts.forEach(t=>{t.date=addDays(t.date,n);if(t.origin!=='feedback')t.origin='adjust'});addLog(U.asid,`Moved ${plural(ts.length,'unfinished task')} from ${shortD(from)} ${n>0?plural(n,'day')+' later':plural(Math.abs(n),'day')+' earlier'}`);commit(`Moved ${plural(ts.length,'task')}`);break}
+    case 'load':{const sub=g('subject'),p=Number(g('pct'));const ts=LS(U.asid).tasks.filter(t=>t.date>=TODAY()&&t.date<=addDays(TODAY(),14)&&!isDone(t)&&(sub==='all'||t.subject===sub));if(!ts.length){toast('No tasks to adjust');return}ts.forEach(t=>{t.minutes=Math.max(5,Math.round(t.minutes*(1+p/100)/5)*5);if(t.origin!=='feedback')t.origin='adjust'});addLog(U.asid,`${sub==='all'?'All subjects':SUB(sub).name}: workload ${p>0?'+':''}${p}% (${plural(ts.length,'task')})`);commit('Workload adjusted');break}
+    case 'catchup':{const ts=catchup(U.asid,Number(g('per'))||2);if(!ts.length){toast('No overdue tasks');return}addLog(U.asid,`Rescheduled ${plural(ts.length,'overdue task')} from tomorrow`);commit(`Rescheduled ${plural(ts.length,'task')}`);break}
+    case 'feedback':{const fb={id:uid('f'),date:g('date')||TODAY(),subject:g('subject'),scores:{understanding:Number(g('understanding')),completion:Number(g('completion')),effort:Number(g('effort'))},focus:g('focus'),comment:g('comment'),share:fd.get('share')==='1',adjustments:[]};LS(U.asid).feedback.push(fb);U.pendingFb=fb.id;window.scrollTo({top:0,behavior:'smooth'});commit('Feedback saved · review the suggestions');break}
+    case 'applySugg':{const x=LS(U.asid),fb=x.feedback.find(z=>z.id===f.dataset.fb);if(!fb)return;const pick=fd.getAll('opt');const sg=suggest(U.asid,fb).filter(o=>pick.includes(o.key));sg.forEach(o=>{o.apply();if(o.key!=='keep'){fb.adjustments.push(o.label);addLog(U.asid,'From feedback · '+o.label,fb.id)}});U.pendingFb=null;const n=sg.filter(o=>o.key!=='keep').length;commit(n?`Applied ${plural(n,'change')} to the plan`:'Feedback shared');break}
+    case 'review':{const t=LS(U.asid).tasks.find(z=>z.id===f.dataset.id);const dec=e.submitter&&e.submitter.value||'done';t.review=g('review');t.status=dec;addLog(U.asid,`${t.title} · ${dec==='done'?'approved':'resubmission requested'}`);commit(dec==='done'?'Approved':'Asked to resubmit');break}
+    case 'submit':{const t=LS(U.sid).tasks.find(z=>z.id===f.dataset.id);t.answer=g('answer');t.status='submitted';t.submittedAt=nowAt();U.modal=null;commit('Submitted! You’ll see your mentor’s comments here');break}
+    case 'session':{const m=U.modal,sid=m.id?m.sid:g('sid'),x=LS(sid),link=g('meet');if(link&&!isMeet(link)){toast('Please enter a Google Meet link (https://meet.google.com/…)');return}const o={date:g('date'),time:g('time'),minutes:Number(g('minutes'))||30,topic:g('topic'),meet:link};
+      if(m.id)Object.assign(x.sessions.find(s=>s.id===m.id),o);else x.sessions.push({id:uid('m'),status:'scheduled',notes:'',...o});
+      if(link&&fd.get('setDefault')==='1')student(sid).meet=link;U.modal=null;commit(m.id?'Session updated':'Session booked · the learner now sees a video call button');break}
+    case 'sessDone':{const m=U.modal,s=LS(m.sid).sessions.find(z=>z.id===m.id);s.status='done';s.notes=g('notes');U.modal=null;if(fd.get('toFb')==='1'){U.aview='student';U.asid=m.sid;U.atab='feedback'}commit('Session marked as done');break}
+    case 'lesson':{const m=U.modal;const steps=g('steps').split('\n').map(r=>r.split('|').map(x=>x.trim())).filter(r=>r[0]).map(r=>({t:r[0],f:r[1]||'',b:r[2]||''}));const v=g('video');if(v&&!/^https?:\/\//.test(v)){toast('Video links must start with https://');return}const o={subject:g('subject'),title:g('title'),minutes:Number(g('minutes'))||10,video:v,summary:g('summary'),steps,homework:g('homework')};if(m.id)Object.assign(lesson(m.id),o);else C.lessons.push({id:uid('l'),quiz:[],...o});U.modal=null;commit('Lesson saved');break}
+    case 'newStudent':{const link=g('meet');if(link&&!isMeet(link)){toast('Please check the Google Meet link');return}const s={id:uid('s'),name:g('name'),grade:g('grade'),goal:g('goal'),meet:link,tone:TONES[C.students.length%5],note:''};C.students.push(s);LS(s.id);U.aview='student';U.asid=s.id;U.atab='plan';U.modal=null;commit('Learner added');break}
+    case 'profile':{const s=student(U.asid),link=g('meet');if(link&&!isMeet(link)){toast('Please enter a Google Meet link (https://meet.google.com/…)');return}Object.assign(s,{name:g('name')||s.name,grade:g('grade'),goal:g('goal'),note:g('note'),meet:link,tone:g('tone')||s.tone});commit('Saved');break}
+    case 'mentor':{C.mentor.name=g('name')||'Mentor';commit('Saved');break}
+  }
+});
+boot();
+</script>
+</body>
+</html>
